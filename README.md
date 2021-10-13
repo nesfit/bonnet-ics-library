@@ -4,11 +4,11 @@ A library of ICS network anomaly detection methods.
 
 ## Introduction
 
-This project
+This project...
 
 ## Environment
 
-The individual projects can be compiled in Linux with installed dependencies.
+The individual projects can be compiled in Linux OS with installed dependencies.
 
 ### Dependencies
 

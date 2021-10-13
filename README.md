@@ -21,31 +21,18 @@ The solution consists of different methods that the following have dependencies:
 
 ### Linux Machine
 
-The necessary dependencies can be installed using the following environment installation script.
+This method considers to use Ubuntu 20.04 LTS, but can be modified for other Linux systems too.
+The necessary dependencies can be installed using the environment installation script `setup-environment.sh`.
+The required packages are:
 
-
-
-### Vagrant
-
-This is the easiest way as everything is done automatically using the Vargant file. The only requirement is to have working [Vagrant installation](https://www.vagrantup.com/downloads).
-
-1. Create a VM described in Vagrant file:
-```
-vagrant up
-```
-
-2. Access the created VM:
-```
-vagrant ssh
-```
-
-Then everything is available in the machine - source codes, dependencies, data, necessary SDKs, etc.
+* .NET 5.0 
+* Python 3.6
 
 ### Windows Subsystem for Linux (WSL2) with Visual Studio Code
 
 This method enables to develop on a host running Microsoft Windows 10 with WSL enabled. For instance, it is useful in the combination with Visual Studio Code that enables to remotely connect to the Linux instance . Contrary to Vagrant, it is not necessary to set up file sharing as this is done automatically by the operating system and WSL.
 
-1. Setup WSL (https://wiki.ubuntu.com/WSL)
+1. Setup WSL2 and install Ubuntu 20.04 LTS (https://wiki.ubuntu.com/WSL)
 
 3. Install necessary dependencies:
 ```
@@ -56,7 +43,47 @@ TODO
 
 ### Multipass
 
-Alternatively, it is possible to use multipass, which is 
+Alternatively, it is possible to use multipass, which provides a virtual Linux environment suitable for development and testing. Steps:
+
+1. Install multipass for your OS (https://multipass.run/).
+
+2. Create a VM using the following command:
+
+```
+multipass launch -n bonnet focal
+```
+3. Setup sharing project folder on a host with VM:
+
+```
+multipass mount . bonnet:/mnt/bonnet
+```
+4. Connect to VM and go to the project folder:
+
+```
+multipass shell bonnet
+```
+
+```
+cd /mnt/bonnet
+```
+
+5. Execute environment set script
+
+```
+chmod a+x setup-environment.sh
+./setup-environment.sh
+```
+
+```
+wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+sudo dpkg -i packages-microsoft-prod.deb
+rm packages-microsoft-prod.deb
+sudo apt upgrade
+sudo apt-get update; \
+  sudo apt-get install -y apt-transport-https && \
+  sudo apt-get update && \
+  sudo apt-get install -y dotnet-sdk-5.0
+```
 
 ## Acknowledge
 

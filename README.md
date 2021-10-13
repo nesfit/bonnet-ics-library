@@ -48,10 +48,12 @@ Alternatively, it is possible to use Multipass, which provides a virtual Linux e
 
 1. Install multipass for your OS (<https://multipass.run/>).
 
-2. Create a VM using the following command:
+2. Create a VM and see its properties, e.g., assigned IP address:
 
 ```bash
 multipass launch -n bonnet focal
+
+multipass info bonnet
 ```
 
 3. Setup sharing project folder on a host with VM:
@@ -78,6 +80,40 @@ chmod a+x setup-environment.sh
 ```
 
 When completing all the previous steps, the environment is prepared to compile the library. The project is mounted in the VM at folder `/mnt/bonnet`.
+Additionally, it is possible to configure Visual Studio Code Remote Development (https://code.visualstudio.com/docs/remote/ssh#_getting-started). The key step is to enable SSH access to the created VM.
+When VM is created Multipass generates pair of keys for SSH access. These keys are not located in user folder but in system. Depending on the OS, they
+are at the following locations:
+
+|  OS     | Path                                                                           |
+| ------- | -------------------------------------------------------------------------------|
+| MacOS   | `/var/root/Library/Application\ Support/multipassd/ssh-keys/id_rsa`            |
+| Windows | `C:\Windows\System32\config\systemprofile\AppData\Roaming\multipassd\ssh-keys` |
+
+1. First, test the SSH connection:
+
+```bash
+sudo ssh -i /var/root/Library/Application\ Support/multipassd/ssh-keys/id_rsa ubuntu@<VM-IP-ADDRESS>
+```
+
+2. The private key cannot be used from system location. It is necessary to copy it to .ssh folder and change the owner:
+
+```bash
+sudo cp /var/root/Library/Application\ Support/multipassd/ssh-keys/id_rsa ~/.ssh/id_rsa_bonnet
+sudo chown <USER> ~/.ssh/id_rsa_bonnet
+```
+
+3. Modify the configuration file `~/.ssh/config` of SSH client by adding the following lines:
+
+```
+Host bonnet
+  HostName <VM-IP-ADDRESS>
+  User ubuntu
+  IdentityFile ~/.ssh/id_rsa_bonnet
+```
+
+4. In Visual Studio Code it is necessary to install *Remote Development* package (https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack) and select *Remote-SSH: Connect to Host...* command to establish the connection with VM.  
+
+5. New Visual Studio Code window is opened and connected to bonnet VM. Open folder `/mnt/bonnet` to access the project.  
 
 ## Acknowledge
 

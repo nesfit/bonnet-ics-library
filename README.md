@@ -16,17 +16,13 @@ The solution consists of different methods that the following have dependencies:
 
 | Package   | Documentation                                                     |
 | --------- | ----------------------------------------------------------------- |
-| python36  | <https://www.python.org/downloads/release/python-360/>              |
+| python38  | <https://www.python.org/downloads/release/python-380/>              |
 | .NET 5.0  | <https://docs.microsoft.com/en-us/dotnet/core/install/linux-ubuntu> |
 
 ### Linux Machine
 
 This method considers to use Ubuntu 20.04 LTS, but can be modified for other Linux systems too.
 The necessary dependencies can be installed using the environment installation script `setup-environment.sh`.
-The required packages are:
-
-* .NET 5.0
-* Python 3.6
 
 ### Windows Subsystem for Linux (WSL2) with Visual Studio Code
 

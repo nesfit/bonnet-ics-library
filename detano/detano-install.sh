@@ -1,3 +1,4 @@
+#!/bin/bash
 
 #Install system packages
 sudo apt-get update

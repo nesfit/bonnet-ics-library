@@ -19,7 +19,7 @@ Profiles are printed to standard output, one per line.
 
 ### Parameters:
 
-`-f`: specifies the file with IEC104 data in csv format, required parameter
+`-f`: specifies the file with IEC104 data in csv format, required parameter \
 `-t`: allows to specify the size of the time window in seconds, optional parametr, default value = 300 seconds
 
 ### Example usage:
@@ -37,8 +37,8 @@ Anomalies can be detected with the `detection.py` script.
 
 ### Parameters:
 
-`-f`: specify the file with IEC104 data in csv format, where anomalies should be found, required parameter
-`-p`: specify the file with communications profiles, that will be used to find the anomalies, required parametr
+`-f`: specify the file with IEC104 data in csv format, where anomalies should be found, required parameter \
+`-p`: specify the file with communications profiles, that will be used to find the anomalies, required parametr \
 `-t`: allows to specify the size of the time window in seconds, optinal parametr, default value = 300 seconds
 
 ### Example usage: 

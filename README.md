@@ -1,4 +1,4 @@
-# Detection methods for ICS networks
+# ICS detection algorithms software library
 
 A library of ICS network anomaly detection methods.
 

@@ -4,7 +4,13 @@ A library of ICS network anomaly detection methods.
 
 ## Introduction
 
-This project...
+Software library of algorithms, including their demonstration on the attached data for the detection of anomalies in ICS network traffic. The library processes input data in PCAP format and implements various methods for creating a profile of normal communication and detection of possible deviations. The library consists of methods based on various principles of communication modeling, especially automata, statistical methods, and machine learning.
+
+The project is rather than a single software library a collection of a number of software components that implements the different anomaly detection methods that can be applied to the ICS domain. The following methods are implemented:
+
+* 
+*
+*
 
 ## Environment
 

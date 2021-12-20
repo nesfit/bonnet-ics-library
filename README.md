@@ -8,9 +8,9 @@ Software library of algorithms, including their demonstration on the attached da
 
 The project is rather than a single software library a collection of a number of software components that implements the different anomaly detection methods that can be applied to the ICS domain. The following methods are implemented:
 
-* 
-*
-*
+* [DETANO](detano) is an automated method enabling the creation of an ICS communication profile in the form of a probability automaton and uses this automaton to detect deviations from the normal profile.
+* [StatProf](statistical_profiling) creates a statistical profile for ICS communication, which is used to detect differences in communication patterns. The method calculates traffic statistics based on selected properties of the monitored communication.
+* [MPROF.ICS](mprof.ics) combines a set of ML-based methods (K-means, OC-SVM, PCA, Gaussian, FastTree) for profile calculation from network communication of various ICS protocols. The methods allow us to learn the profile and apply it to the observed communication.
 
 ## Environment
 

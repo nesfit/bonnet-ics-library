@@ -1,0 +1,30 @@
+﻿Name,Type,Data Type,Address
+Moving X,Input,Bool,Input 0
+Moving Z,Input,Bool,Input 1
+Item detected,Input,Bool,Input 2
+Lid at place,Input,Bool,Input 3
+Lid clamped,Input,Bool,Input 4
+Pos. at limit (lids),Input,Bool,Input 5
+Base at place,Input,Bool,Input 6
+Base clamped,Input,Bool,Input 7
+Pos. at limit (bases),Input,Bool,Input 8
+Part leaving,Input,Bool,Input 9
+Start,Input,Bool,Input 10
+Reset,Input,Bool,Input 11
+Stop,Input,Bool,Input 12
+Emergency stop,Input,Bool,Input 13
+Auto,Input,Bool,Input 14
+FACTORY I/O (Running),Input,Bool,Input 15
+Move X,Output,Bool,Coil 0
+Move Z,Output,Bool,Coil 1
+Grab,Output,Bool,Coil 2
+Lids conveyor,Output,Bool,Coil 3
+Clamp lid,Output,Bool,Coil 4
+Pos. raise (lids),Output,Bool,Coil 5
+Bases conveyor,Output,Bool,Coil 6
+Clamp base,Output,Bool,Coil 7
+Pos. raise (bases),Output,Bool,Coil 8
+Start light,Output,Bool,Coil 9
+Reset light,Output,Bool,Coil 10
+Stop light,Output,Bool,Coil 11
+Counter,Output,Int,Holding Reg 0

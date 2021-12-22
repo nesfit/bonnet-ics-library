@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>    
+    <IsPackable>false</IsPackable>
+    <OutputType>Exe</OutputType>
+	<TargetFramework>net5.0</TargetFramework>
+	<LangVersion>preview</LangVersion>
+	<StartupObject>IcsMonitor.Program</StartupObject>
+    <Version>0.0.1</Version>
+    <Company>Brno University of Technology</Company>
+    <Authors>Ondrej Rysavy</Authors>
+    <Description>A tool for anomaly detection in industrial communication networks.</Description>
+    <Copyright>Copyright (c) Brno University of Technology. All rights reserved.</Copyright>
+    <RepositoryUrl>https://github.com/rysavy-ondrej/bonnet-ics</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+  </PropertyGroup>
+
+	<PropertyGroup>
+		<RestoreSources>$(RestoreSources);../../packages;https://api.nuget.org/v3/index.json</RestoreSources>
+	</PropertyGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="CsvHelper" Version="26.1.0" />
+
+    <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
+
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.1.0" />
+
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
+
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+
+    <PackageReference Include="Microsoft.ML" Version="1.6.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.1.1" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.1.1" />
+    <PackageReference Include="coverlet.collector" Version="1.3.0" />
+    <PackageReference Include="Microsoft.ML.TimeSeries" Version="1.5.2" />
+	<PackageReference Include="Traffix.Core" Version="1.0.1" />
+    <PackageReference Include="Traffix.DataView" Version="1.0.0" />
+    <PackageReference Include="Traffix.Decoders" Version="1.0.0" />
+    <PackageReference Include="Traffix.Providers" Version="1.0.0" />
+    <PackageReference Include="YamlDotNet" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="TestData\run11.pcap">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

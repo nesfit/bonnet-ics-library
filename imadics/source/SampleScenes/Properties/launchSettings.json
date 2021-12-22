@@ -1,0 +1,24 @@
+{
+  "profiles": {
+    "AssemblerAnalog": {
+      "commandName": "Project",
+      "commandLineArgs": "192.168.111.17:502/1 AssemblerAnalog "
+    },
+    "Assembler": {
+      "commandName": "Project",
+      "commandLineArgs": "192.168.111.17:502/1 Assembler "
+    },
+    "ProductionLine": {
+      "commandName": "Project",
+      "commandLineArgs": "192.168.111.17:502/1 ProductionLine"
+    },
+    "SeparatingStation": {
+      "commandName": "Project",
+      "commandLineArgs": "192.168.111.17:502/1 SeparatingStation "
+    },
+    "SortingStation": {
+      "commandName": "Project",
+      "commandLineArgs": "192.168.111.17:502/1 SortingStation"
+    }
+  }
+}

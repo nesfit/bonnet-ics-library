@@ -1,0 +1,26 @@
+﻿Name,Type,Data Type,Address
+Item detected,Input,Bool,Input 0
+Lid at place,Input,Bool,Input 1
+Base at place,Input,Bool,Input 2
+Part leaving,Input,Bool,Input 3
+Start,Input,Bool,Input 4
+Reset,Input,Bool,Input 5
+Stop,Input,Bool,Input 6
+Emergency stop,Input,Bool,Input 7
+Auto,Input,Bool,Input 8
+FACTORY I/O (Running),Input,Bool,Input 9
+Lids conveyor 1,Output,Bool,Coil 0
+Stop blade 1,Output,Bool,Coil 1
+Lids conveyor 2,Output,Bool,Coil 2
+Bases conveyor 1,Output,Bool,Coil 3
+Stop blade 2,Output,Bool,Coil 4
+Bases conveyor 2,Output,Bool,Coil 5
+Grab,Output,Bool,Coil 6
+Start light,Output,Bool,Coil 7
+Reset light,Output,Bool,Coil 8
+Stop light,Output,Bool,Coil 9
+X,Input,Real,Input Reg 0
+Z,Input,Real,Input Reg 1
+Set X,Output,Real,Holding Reg 0
+Set Z,Output,Real,Holding Reg 1
+Counter,Output,Int,Holding Reg 2

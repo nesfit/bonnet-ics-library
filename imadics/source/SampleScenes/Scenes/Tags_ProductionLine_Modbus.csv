@@ -1,0 +1,27 @@
+﻿Name,Type,Data Type,Address
+Lids at entry,Input,Bool,Input 0
+Lids center (busy),Input,Bool,Input 1
+Lids center (has error),Input,Bool,Input 2
+Lids at exit,Input,Bool,Input 3
+Bases at entry,Input,Bool,Input 4
+Bases center (busy),Input,Bool,Input 5
+Bases center (has error),Input,Bool,Input 6
+Bases at exit,Input,Bool,Input 7
+FACTORY I/O (Running),Input,Bool,Input 8
+Lids raw conveyor,Output,Bool,Coil 0
+Lids center (produce lids),Output,Bool,Coil 1
+Lids center (start),Output,Bool,Coil 2
+Lids center (reset),Output,Bool,Coil 3
+Lids center (stop),Output,Bool,Coil 4
+Lids exit conveyor 1,Output,Bool,Coil 5
+Lids exit conveyor 2,Output,Bool,Coil 6
+Bases raw conveyor,Output,Bool,Coil 7
+Bases center (produce lids),Output,Bool,Coil 8
+Bases center (start),Output,Bool,Coil 9
+Bases center (reset),Output,Bool,Coil 10
+Bases center (stop),Output,Bool,Coil 11
+Bases exit conveyor 1,Output,Bool,Coil 12
+Bases exit conveyor 2,Output,Bool,Coil 13
+Exit conveyor,Output,Bool,Coil 14
+Lids counter,Output,Int,Holding Reg 0
+Bases counter,Output,Int,Holding Reg 1

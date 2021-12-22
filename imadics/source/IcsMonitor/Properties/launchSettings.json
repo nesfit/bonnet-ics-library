@@ -1,0 +1,43 @@
+{
+  "profiles": {
+    "export-flows": {
+      "commandName": "Project",
+      "commandLineArgs": "export-flows -r \"lemay\\attack\\characterization_modbus_6RTU_with_operate.pcap\" -p modbus -t \"00:01:00\" -f csv -w \"lemay\\attack\\characterization_modbus_6RTU_with_operate.flows.csv\"",
+      "workingDirectory": "$(SolutionDir)data\\modbus"
+    },
+    "monitor-flows-file": {
+      "commandName": "Project",
+      "commandLineArgs": "Watch-Traffic -r \"lemay\\attack\\characterization_modbus_6RTU_with_operate.pcap\" -p \"profiles\\6RTU_with_operate.profile.zip\" -f csv > \"results\\6RTU_with_operate.csv\"",
+      "workingDirectory": "$(SolutionDir)data\\modbus"
+    },
+    "monitor-flows-live": {
+      "commandName": "Project",
+      "commandLineArgs": "Watch-Traffic -i 0  -p profiles\\factory-assembler-1m.profile.zip -f yaml",
+      "workingDirectory": "$(SolutionDir)data\\modbus\\"
+    },
+    "build-profile-flows": {
+      "commandName": "Project",
+      "commandLineArgs": "Build-Profile -R \"lemay\\attack\\characterization_modbus_6RTU_with_operate.flows.csv\" -t \"00:01:00\" -c 60 -m Centroids -p Modbus -f \"ForwardMetricsPackets,ForwardMetricsOctets,ReverseMetricsPackets,ReverseMetricsOctets\" -w \"profiles\\6RTU_with_operate.profile.zip\"",
+      "workingDirectory": "$(SolutionDir)data\\modbus"
+    },
+    "build-profile-live": {
+      "commandName": "Project",
+      "commandLineArgs": "Build-Profile -i 0 -m centroids -p modbus -t 00:00:10 -c 30 -w .\\data\\modbus\\profiles\\factory-assembler-10s.profile.zip"
+    },
+    "show-profile": {
+      "commandName": "Project",
+      "commandLineArgs": "show-profile  -p \"profiles\\6RTU_with_operate.profile.zip\"",
+      "workingDirectory": "$(SolutionDir)data\\modbus"
+    },
+    "build-profile-file": {
+      "commandName": "Project",
+      "commandLineArgs": "build-profile -r \"lemay\\attack\\characterization_modbus_6RTU_with_operate.pcap\" -t \"00:01:00\" -c 30 -m Centroids -p Modbus -f \"ForwardMetricsPackets,ForwardMetricsOctets,ReverseMetricsPackets,ReverseMetricsOctets\" -w \"profiles\\6RTU_with_operate.profile.zip\"",
+      "workingDirectory": "$(SolutionDir)data\\modbus"
+    },
+    "test-flows": {
+      "commandName": "Project",
+      "commandLineArgs": "test-flows -R \"lemay\\attack\\characterization_modbus_6RTU_with_operate.flows.csv\" -p \"profiles\\6RTU_with_operate.profile.zip\" -f csv > \"results\\6RTU_with_operate.csv\"",
+      "workingDirectory": "$(SolutionDir)data\\modbus"
+    }
+  }
+}

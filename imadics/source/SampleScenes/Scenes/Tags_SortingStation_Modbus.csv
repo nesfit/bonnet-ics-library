@@ -1,0 +1,24 @@
+﻿Name,Type,Data Type,Address
+At exit,Input,Bool,Input 0
+Start,Input,Bool,Input 1
+Reset,Input,Bool,Input 2
+Stop,Input,Bool,Input 3
+Emergency stop,Input,Bool,Input 4
+Auto,Input,Bool,Input 5
+FACTORY I/O (Running),Input,Bool,Input 6
+Entry conveyor,Output,Bool,Coil 0
+Stop blade,Output,Bool,Coil 1
+Exit conveyor,Output,Bool,Coil 2
+Sorter 1 turn,Output,Bool,Coil 3
+Sorter 1 belt,Output,Bool,Coil 4
+Sorter 2 turn,Output,Bool,Coil 5
+Sorter 2 belt,Output,Bool,Coil 6
+Sorter 3 turn,Output,Bool,Coil 7
+Sorter 3 belt,Output,Bool,Coil 8
+Start light,Output,Bool,Coil 9
+Reset light,Output,Bool,Coil 10
+Stop light,Output,Bool,Coil 11
+Vision sensor,Input,Int,Input Reg 0
+Counter 1,Output,Int,Holding Reg 0
+Counter 2,Output,Int,Holding Reg 1
+Counter 3,Output,Int,Holding Reg 2

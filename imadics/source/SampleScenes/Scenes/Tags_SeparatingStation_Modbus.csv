@@ -1,0 +1,27 @@
+﻿Name,Type,Data Type,Address
+Sensor 1,Input,Bool,Input 0
+Pusher 1 front,Input,Bool,Input 1
+Pusher 1 back,Input,Bool,Input 2
+At pusher 1 exit,Input,Bool,Input 3
+Sensor 2,Input,Bool,Input 4
+Pusher 2 front,Input,Bool,Input 5
+Pusher 2 back,Input,Bool,Input 6
+At pusher 2 exit,Input,Bool,Input 7
+Start,Input,Bool,Input 8
+Reset,Input,Bool,Input 9
+Stop,Input,Bool,Input 10
+Emergency stop,Input,Bool,Input 11
+FACTORY I/O (Running),Input,Bool,Input 12
+Entry conveyor 1,Output,Bool,Coil 0
+Pusher 1,Output,Bool,Coil 1
+Conveyor 1,Output,Bool,Coil 2
+Entry conveyor 2,Output,Bool,Coil 3
+Pusher 2,Output,Bool,Coil 4
+Conveyor 2,Output,Bool,Coil 5
+Start light,Output,Bool,Coil 6
+Reset light,Output,Bool,Coil 7
+Stop light,Output,Bool,Coil 8
+Vision sensor 1,Input,Int,Input Reg 0
+Vision sensor 2,Input,Int,Input Reg 1
+Counter 1,Output,Int,Holding Reg 0
+Counter 2,Output,Int,Holding Reg 1

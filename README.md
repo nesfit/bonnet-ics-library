@@ -36,11 +36,7 @@ This method enables to develop on a host running Microsoft Windows 10 with WSL e
 
 1. Setup WSL2 and install Ubuntu 20.04 LTS (<https://wiki.ubuntu.com/WSL>)
 
-3. Install necessary dependencies:
-
-```
-TODO
-```
+2. Install necessary dependencies (see `setup-environment.sh` script)
 
 3. Open WSL shell or run Visual Studio Code in WSL using the Remote WSL extension (<https://code.visualstudio.com/docs/remote/wsl-tutorial>).
 

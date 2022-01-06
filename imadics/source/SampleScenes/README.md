@@ -113,10 +113,7 @@ It is also possible to capture on loopback interface, eg:
 tshark -i \Device\NPF_Loopback "port 502"
 ```
 
-
-
 To automate dataset creation all the previous steps needs to be combined.
-
 
 
 # Related Projects

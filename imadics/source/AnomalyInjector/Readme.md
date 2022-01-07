@@ -11,10 +11,12 @@ Anomalies can be roughly identified as either errors or attacks. While errors re
 
 The errors can be either network related or factory based.
 
-Network relate errors are 
+Network relate errors are: 
 
-* excessive packet delays causeing the messages are delivered late and thus this influence the process being controlled 
-* some. packet are dropped which means that they need to be retrasmitted and again this can cause the delay
+* *packet delays and jitter* cause that some messages are delivered late and thus this influence the process being controlled 
+* *packet loss* means that they need to be retrasmitted and again this can cause the delay
+
+To simulate the effect of network errors we can use [Toxiproxy](https://github.com/shopify/toxiproxy).
 
 Factory related error can be simulated by failure injection method provided by Factory I/O on most of the parts. It is possible to set:
 

@@ -45,7 +45,7 @@ Anomalify.exe [MODBUS-SERVER-URI] [ATTACK-TYPE] [ATTACK-PARAMETERS]
 
 ### Address Scan
 
-Address scan reconnaissance stands for identification of MODBUS devices on the given IP address. The address range for MODBUS RTU and ASCII systems is the attack parameter. The valid range is 0..247. The response may be acknowledgement or an error message.
+Address scan reconnaissance stands for identification of MODBUS devices on the given IP address. The address range for MODBUS RTU and ASCII systems is the attack parameter. The valid range is 0..247. Value 0 stands for broadcast address. The response may be acknowledgement or an error message.
 
 ```
 Anomalify.exe [MODBUS-SERVER-URI] Address-Scan [ADDRESS-SCAN-RANGE]
@@ -54,19 +54,39 @@ Anomalify.exe [MODBUS-SERVER-URI] Address-Scan [ADDRESS-SCAN-RANGE]
 For example:
 
 ```
-Anomalify.exe 192.168.111.17:502 Address-Scan 1-100 
+Anomalify.exe 192.168.111.17:502 Address-Scan [1-100] 
+```
+
+```
+Anomalify.exe 192.168.111.17:502 Address-Scan {1,3,5,7,9} 
 ```
 
 ### Function Code Scan
 
+This attack represents the way to enumerate a list of supported functions of RTU device. An attacker sends a query to all required function codes. MODBUS query payloads vary by function code. However, an attacker need not form a proper payload for each function code to determine if a function code is supported by a MODBUS server. If the function code is not supported an exception code 1 (invalid function code) response will be returned. All other responses, whether indicating an error or transaction success, indicate the function code is supported by the targeted server.
+
 ```
-Anomalify.exe FunctionCode-Scan
+Anomalify.exe [MODBUS-SERVER-URI/DEVICE-ADDRESS] FunctionCode-Scan [FC-RANGE]
+```
+
+For example:
+
+```
+Anomalify.exe 192.168.111.17:502/1 Address-Scan {1,2,3,4,5,6} 
 ```
 
 ### Device Identification 
 
+MODBUS servers may provide function code that allows the client to read device identification information. Function code 0x11 allows an attacker to obtain the current run status and other device-specific information. According to the documentation, this is only available for serial lines. MODBUS servers may also implement function code 0x2B to provide access to basic, common, and advanced information.  The basic is mandatory for all MODBUS servers and includes vendor name, product code, and major and minor revisions. This operation implements reading BASIC, COMMON, and ADVANCED information. 
+
 ```
-Anomalify.exe Device-Identification 
+Anomalify.exe [MODBUS-SERVER-URI/DEVICE-ADDRESS] Device-Identification [BASIC|COMMON|ADVANCED] 
+```
+
+For example:
+
+```
+Anomalify.exe 192.168.111.17:502/1 Address-Scan BASIC 
 ```
 
 

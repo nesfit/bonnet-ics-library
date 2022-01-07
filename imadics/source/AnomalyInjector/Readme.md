@@ -24,18 +24,50 @@ Factory related error can be simulated by failure injection method provided by F
 * Short circuit 
 * Forced Value
 
+The issue is that it seems this is not possible programmatically and must be only done in the UI.  
+
 ### Attacks
 
 Morris and Gao (2013) identified 17 different attacks on ICS communiting with MODBUS protocol. They grouped these attacks into the following categories:
 
-* Recopnnaissance
+* Reconnaissance - Address Scan, Function Code Scan, Device Identification
 * Response and measurement injection
 * Commands injection
 * Denial of Service
 
 ## Usage
 
-TODO:...
+Attacks are injected by executing the tool with URI of the MODBUS server specified.
+
+```
+Anomalify.exe [MODBUS-SERVER-URI] [ATTACK-TYPE] [ATTACK-PARAMETERS]
+```
+
+### Address Scan
+
+Address scan reconnaissance stands for identification of MODBUS devices on the given IP address. The address range for MODBUS RTU and ASCII systems is the attack parameter. The valid range is 0..247. The response may be acknowledgement or an error message.
+
+```
+Anomalify.exe [MODBUS-SERVER-URI] Address-Scan [ADDRESS-SCAN-RANGE]
+```
+
+For example:
+
+```
+Anomalify.exe 192.168.111.17:502 Address-Scan 1-100 
+```
+
+### Function Code Scan
+
+```
+Anomalify.exe FunctionCode-Scan
+```
+
+### Device Identification 
+
+```
+Anomalify.exe Device-Identification 
+```
 
 
 ## References

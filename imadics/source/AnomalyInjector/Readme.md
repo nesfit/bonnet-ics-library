@@ -54,15 +54,14 @@ Address scan reconnaissance stands for identification of MODBUS devices on the g
 Anomalify.exe [MODBUS-SERVER-URI] Address-Scan [ADDRESS-SCAN-RANGE]
 ```
 
+* ADDRESS-SCAN-RANGE defines the ranges of device addresses to scan. It can be given as a list of subranges, e.g., 1,10..20,30,40,50,60..80
+
 For example:
 
 ```
-Anomalify.exe 192.168.111.17:502 Address-Scan [1-100] 
+Anomalify.exe 192.168.111.17:502 Address-Scan 1..100 
 ```
 
-```
-Anomalify.exe 192.168.111.17:502 Address-Scan {1,3,5,7,9} 
-```
 
 ### A2. Function Code Scan
 

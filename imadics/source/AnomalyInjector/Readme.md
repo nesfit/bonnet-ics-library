@@ -118,6 +118,9 @@ This attack will change the return value, ie. Bit 9. The type of modification is
 Anomalify.exe [MODBUS-SERVER-URI/DEVICE-ADDRESS] Naive-Read-PayloadSizes [ZERO|ONES|RANDOM] --repeat REPEAT [--delay DELAY|--skip SKIP]
 ```
 
+* ```ZERO``` always set the paylod to 0
+* ```ONES``` always set the payload to 1
+* ```RANDOM``` use random value to replace the original content
 * ```REPEAT``` specifies how many NRMI modifications should be made. If not specified it performs an infinite number of modifications
 * ```DELAY``` the delay between modifications. If not set no delay is applied.
 * ```SKIP``` skips the specified number of replies between modifications. 
@@ -129,6 +132,25 @@ Anomalify.exe 192.168.111.17:502/1 Naive-Read-PayloadSizes --skip 9
 ```
 
 ### A5. Invalid Read Payload Size
+
+In this attack, the reply is modified in a way that the number of requested objects does not match the request. The response can be modified by trimming the content part or by extending it with fixed or randomly generated values.
+
+```
+Anomalify.exe [MODBUS-SERVER-URI/DEVICE-ADDRESS] Invalid-Read-PayloadSizes [TRIM|EXTEND|RANDOM] --repeat REPEAT [--delay DELAY|--skip SKIP]
+```
+
+* ```TRIM``` modifies the respoonse by trimming the value
+* ```EXTEND``` modifies the response by extending the value
+* ```RANDOM``` modifies the size of the value randomly
+* ```REPEAT``` specifies how many NRMI modifications should be made. If not specified it performs an infinite number of modifications
+* ```DELAY``` the delay between modifications. If not set no delay is applied.
+* ```SKIP``` skips the specified number of replies between modifications. 
+
+For instance, the following command modifies each 10th reply in the communication:
+
+```
+Anomalify.exe 192.168.111.17:502/1 Naive-Read-PayloadSizes --skip 9
+```
 
 ### A6.  Naïve False Error Response
 

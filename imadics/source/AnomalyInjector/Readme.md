@@ -154,6 +154,22 @@ Anomalify.exe 192.168.111.17:502/1 Naive-Read-PayloadSizes --skip 9
 
 ### A6.  Naïve False Error Response
 
+The attack modifies the response in a way that it inserts false error code in the message. The modification is trivial by setting the MSB of the function code, eg., for `Reading Discrete Input`, which has FC `0x02`, the error answer is `0x82`.
+
+```
+Anomalify.exe [MODBUS-SERVER-URI/DEVICE-ADDRESS] Naive-False-ErrorResponse --repeat REPEAT [--delay DELAY|--skip SKIP]
+```
+
+* ```REPEAT``` specifies how many NRMI modifications should be made. If not specified it performs an infinite number of modifications
+* ```DELAY``` the delay between modifications. If not set no delay is applied.
+* ```SKIP``` skips the specified number of replies between modifications. 
+
+For instance, the following command modifies each 10th reply in the communication:
+
+```
+Anomalify.exe 192.168.111.17:502/1 Naive-False-ErrorResponse --skip 9
+```
+
 ### A7. Sporadic Sensor Measurement Injection
 
 ### A8. Calculated Sensor Measurement Injection

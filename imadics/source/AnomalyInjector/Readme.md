@@ -93,6 +93,40 @@ Anomalify.exe 192.168.111.17:502/1 Address-Scan BASIC
 ```
 
 ### A4. Naïve Read Payload Size
+An NMRI attack can craft malicious responses which include the correct quantity of returned objects but with preset or randomly generated content.
+Executing this command creates the proxy which connects to specified MODBUS server. 
+
+For instance, the query:
+
+```
+Function Code: Read Discrete Input (2)
+Reference Number: 9
+Bit Count: 1
+```
+
+will answer with:
+
+```
+Function Code: Read Discrete Input (2)
+Byte Count: 1
+Bit 9: False
+```
+
+This attack will change the return value, ie. Bit 9. The type of modification is either to set the value to zero or one or to generate random content.
+
+```
+Anomalify.exe [MODBUS-SERVER-URI/DEVICE-ADDRESS] Naive-Read-PayloadSizes [ZERO|ONES|RANDOM] --repeat REPEAT [--delay DELAY|--skip SKIP]
+```
+
+* ```REPEAT``` specifies how many NRMI modifications should be made. If not specified it performs an infinite number of modifications
+* ```DELAY``` the delay between modifications. If not set no delay is applied.
+* ```SKIP``` skips the specified number of replies between modifications. 
+
+For instance, the following command modifies each 10th reply in the communication:
+
+```
+Anomalify.exe 192.168.111.17:502/1 Naive-Read-PayloadSizes --skip 9
+```
 
 ### A5. Invalid Read Payload Size
 
@@ -116,9 +150,17 @@ Anomalify.exe 192.168.111.17:502/1 Address-Scan BASIC
 
 ### A15. Restart Communication
 
-### A16. Invalid Cyclic Redundancy Code 
+### A16. Denial of Service Attacks
 
-### A17. MODBUS Master Traffic Jamming
+Denial of Service (DOS) attacks attempt to stop the proper functioning of some portion of the cyber-physical system. There may be several variations of this attack. We only consider MODBUS/TCP environment. The specific DOS attack includes generating MODBUS/TCP messages and sending them towards the attacked device. 
+This attack considers to create a new TCP connection to the device and send MODBUS message using the given rate.
+
+```
+Anomalify.exe [MODBUS-SERVER-URI/DEVICE-ADDRESS] Denial-Of-Service --duration DURATION --rate RATE
+```
+
+* ```DURATION``` specifies the duration of the attack 
+* ```RATE``` specifies the attack rate, ie., message per second
 
 ## References
 * Morris TH, Gao W. Industrial Control System Cyber Attacks. In: Proceedings of the 1st International Symposium for ICS&SCADA Cyber Security Research. ; 2013:22-29. doi:10.14236/ewic/icscsr2013.3

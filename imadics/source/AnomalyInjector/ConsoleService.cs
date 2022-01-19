@@ -86,7 +86,7 @@ namespace AnomalyInjector
 
             _modbusServerEndpointArgument = new CommandArgument() { Name = "server", Description = "Specifies MODBUS endpoint connection string, e.g., `192.168.111.17:502/1`." };
             app.Command("Address-Scan", AddressScanCommand);
-
+            app.Command("FunctionCode-Scan", FunctionCodeScanCommand);
             try
             {
 
@@ -111,14 +111,40 @@ namespace AnomalyInjector
             command.Arguments.Add(_modbusServerEndpointArgument);
             var scanRangeArgument = command.Argument("scanRange", "Defines the range of device addresses to scan.");
 
-            command.OnExecute(() =>
+            command.OnExecute(async () =>
             {
                 var range = GetListFromRange(scanRangeArgument.Value);
-                Console.WriteLine($"Address Scan {this.ServerEndPoint} : {String.Join(',', range)}");
+                _logger.LogInformation($"Starting Address-Scan: server={this.ServerEndPoint}, address-range={String.Join(',', range)} ");
+
+                var controller = new ModbusReconnaissanceController(this.ServerEndPoint);
+                await foreach (var result in controller.SlaveAddressScanAsync(range))
+                {
+                    Console.WriteLine($"Slave id={result.Address}: {result.Status}");
+                }
                 return 0;
             });
         }
+        private void FunctionCodeScanCommand(CommandLineApplication command)
+        {
+            command.Description = "Function code scan reconnaissance performs enumeration of supoprted functions of the device.";
+            command.HelpOption("-?|-h|--help");
 
+            command.Arguments.Add(_modbusServerEndpointArgument);
+            var scanRangeArgument = command.Argument("scanRange", "Defines the range of function codes to scan.");
+
+            command.OnExecute(async () =>
+            {
+                var range = GetListFromRange(scanRangeArgument.Value);
+                _logger.LogInformation($"Starting Address-Scan: server={this.ServerEndPoint}, function-range={String.Join(',', range)} ");
+
+                var controller = new ModbusReconnaissanceController(this.ServerEndPoint);
+                await foreach (var result in controller.FunctionCodeScanAsync(range))
+                {
+                    Console.WriteLine($"Slave id={result.FunctionCode}: {result.Status}");
+                }
+                return 0;
+            });
+        }
         private int[] GetListFromRange(string value)
         {
             var parts = value.Split(',');

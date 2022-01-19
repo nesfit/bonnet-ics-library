@@ -13,10 +13,11 @@ using System.Threading.Tasks;
 
 namespace AnomalyInjector
 {
+    public enum DeviceIdentificationObject { VendorName = 0, ProductCode, MajorMinorRevision, VendorUrl, ProductName, ModelName, UserApplicationName }
     public enum CheckStatus { OkResponse, ErrorResponse, Timeout, NotSupported }
     public record ModbusSlaveRecord(byte Address, CheckStatus Status);
     public record ModbusFunctionAvailability(byte FunctionCode, CheckStatus Status);
-
+    public record DeviceIdentificationRecord(DeviceIdentificationObject Name, string Value, CheckStatus Status);
     internal class ModbusReconnaissanceController : IDisposable
     {
         private IPEndPoint _endpoint;
@@ -68,7 +69,7 @@ namespace AnomalyInjector
                 {
                     var request = new ReadCoilsInputsRequest(2, (byte)address, 0, 1);
                     var response = master.ExecuteCustomMessage<ReadCoilsInputsResponse>(request);
-                    
+
                     record = (response.FunctionCode == request.FunctionCode) ?
                          new ModbusSlaveRecord((byte)address, CheckStatus.OkResponse) :
                             new ModbusSlaveRecord((byte)address, CheckStatus.ErrorResponse);
@@ -104,9 +105,9 @@ namespace AnomalyInjector
                     var response = master.ExecuteCustomMessage<CustomModbusMessage>(request);
                     functionAvailability = new ModbusFunctionAvailability((byte)functionCode, CheckStatus.OkResponse);
                 }
-                catch(Modbus.SlaveException ex)
+                catch (Modbus.SlaveException ex)
                 {
-                    switch(ex.SlaveExceptionCode)
+                    switch (ex.SlaveExceptionCode)
                     {
                         case 1: functionAvailability = new ModbusFunctionAvailability((byte)functionCode, CheckStatus.NotSupported); break;
                         default: functionAvailability = new ModbusFunctionAvailability((byte)functionCode, CheckStatus.ErrorResponse); break;
@@ -117,6 +118,42 @@ namespace AnomalyInjector
                     functionAvailability = new ModbusFunctionAvailability((byte)functionCode, CheckStatus.Timeout);
                 }
                 yield return functionAvailability;
+                await Task.Delay(Pause);
+            }
+        }
+        
+        public async IAsyncEnumerable<DeviceIdentificationRecord> DeviceIdentificationAsync(IEnumerable<DeviceIdentificationObject> deviceIdentificationObjects)
+        {
+            foreach (var deviceIdentification in deviceIdentificationObjects)
+            {
+                var master = GetConnectedMaster();
+
+                var request = ModbusMessageFactory.CreateModbusMessage<CustomModbusMessage>(new byte[] {
+                        SlaveAddress,               // slave device adress
+                        (byte)0x2b,                 // function code
+                        0x01,                       // read device id code
+                        (byte)deviceIdentification  // object id
+                    });
+
+                DeviceIdentificationRecord record;
+                try
+                {
+                    var response = master.ExecuteCustomMessage<CustomModbusMessage>(request);
+                    record = new DeviceIdentificationRecord(deviceIdentification, String.Empty, CheckStatus.OkResponse);
+                }
+                catch (Modbus.SlaveException ex)
+                {
+                    switch (ex.SlaveExceptionCode)
+                    {
+                        case 1: record = new DeviceIdentificationRecord(deviceIdentification, String.Empty, CheckStatus.NotSupported); break;
+                        default: record = new DeviceIdentificationRecord(deviceIdentification, String.Empty, CheckStatus.ErrorResponse); break;
+                    }
+                }
+                catch (IOException)
+                {
+                    record = new DeviceIdentificationRecord(deviceIdentification, String.Empty, CheckStatus.Timeout);
+                }
+                yield return record;
                 await Task.Delay(Pause);
             }
         }

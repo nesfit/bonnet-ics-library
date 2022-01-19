@@ -87,6 +87,8 @@ namespace AnomalyInjector
             _modbusServerEndpointArgument = new CommandArgument() { Name = "server", Description = "Specifies MODBUS endpoint connection string, e.g., `192.168.111.17:502/1`." };
             app.Command("Address-Scan", AddressScanCommand);
             app.Command("FunctionCode-Scan", FunctionCodeScanCommand);
+            app.Command("DeviceIdentification-Scan", DeviceIdentificationScanCommand);
+            
             try
             {
 
@@ -141,6 +143,27 @@ namespace AnomalyInjector
                 await foreach (var result in controller.FunctionCodeScanAsync(range))
                 {
                     Console.WriteLine($"Slave id={result.FunctionCode}: {result.Status}");
+                }
+                return 0;
+            });
+        }
+        private void DeviceIdentificationScanCommand(CommandLineApplication command)
+        {
+            command.Description = "The command tries to read device identification information.";
+            command.HelpOption("-?|-h|--help");
+
+            command.Arguments.Add(_modbusServerEndpointArgument);
+            var scanRangeArgument = command.Argument("informationRange", "Defines the range of device information to read.");
+
+            command.OnExecute(async () =>
+            {
+                var range = GetListFromRange(scanRangeArgument.Value);
+                _logger.LogInformation($"Starting Device Information Scan: server={this.ServerEndPoint}, device-information-range={String.Join(',', range)} ");
+
+                var controller = new ModbusReconnaissanceController(this.ServerEndPoint);
+                await foreach (var result in controller.DeviceIdentificationAsync(range.Select(x=>(DeviceIdentificationObject)x)))
+                {
+                    Console.WriteLine($"Information name={result.Name} value={result.Value} status={result.Status}");
                 }
                 return 0;
             });

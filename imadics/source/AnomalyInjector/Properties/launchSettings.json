@@ -14,6 +14,10 @@
     "DeviceIdentification-Scan": {
       "commandName": "Project",
       "commandLineArgs": "DeviceIdentification-Scan 192.168.111.17:502/1 0..6"
+    },
+    "Run-Proxy": {
+      "commandName": "Project",
+      "commandLineArgs": "Run-Proxy 192.168.111.17:502/1"
     }
   }
 }

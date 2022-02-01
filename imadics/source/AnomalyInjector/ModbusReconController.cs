@@ -18,7 +18,7 @@ namespace AnomalyInjector
     public record ModbusSlaveRecord(byte Address, CheckStatus Status);
     public record ModbusFunctionAvailability(byte FunctionCode, CheckStatus Status);
     public record DeviceIdentificationRecord(DeviceIdentificationObject Name, string Value, CheckStatus Status);
-    internal class ModbusReconnaissanceController : IDisposable
+    internal class ModbusReconController : IDisposable
     {
         private IPEndPoint _endpoint;
         private ModbusIpMaster _master = null;
@@ -42,7 +42,7 @@ namespace AnomalyInjector
             return _master;
         }
 
-        public ModbusReconnaissanceController(IPEndPoint endpoint)
+        public ModbusReconController(IPEndPoint endpoint)
         {
             _endpoint = endpoint;
         }

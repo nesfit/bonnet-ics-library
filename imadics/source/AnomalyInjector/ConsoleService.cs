@@ -88,7 +88,8 @@ namespace AnomalyInjector
             app.Command("Address-Scan", AddressScanCommand);
             app.Command("FunctionCode-Scan", FunctionCodeScanCommand);
             app.Command("DeviceIdentification-Scan", DeviceIdentificationScanCommand);
-            
+            app.Command("Run-Proxy", RunModbusProxyCommand);
+
             try
             {
 
@@ -118,7 +119,7 @@ namespace AnomalyInjector
                 var range = GetListFromRange(scanRangeArgument.Value);
                 _logger.LogInformation($"Starting Address-Scan: server={this.ServerEndPoint}, address-range={String.Join(',', range)} ");
 
-                var controller = new ModbusReconnaissanceController(this.ServerEndPoint);
+                var controller = new ModbusReconController(this.ServerEndPoint);
                 await foreach (var result in controller.SlaveAddressScanAsync(range))
                 {
                     Console.WriteLine($"Slave id={result.Address}: {result.Status}");
@@ -139,7 +140,7 @@ namespace AnomalyInjector
                 var range = GetListFromRange(scanRangeArgument.Value);
                 _logger.LogInformation($"Starting Address-Scan: server={this.ServerEndPoint}, function-range={String.Join(',', range)} ");
 
-                var controller = new ModbusReconnaissanceController(this.ServerEndPoint);
+                var controller = new ModbusReconController(this.ServerEndPoint);
                 await foreach (var result in controller.FunctionCodeScanAsync(range))
                 {
                     Console.WriteLine($"Slave id={result.FunctionCode}: {result.Status}");
@@ -160,7 +161,7 @@ namespace AnomalyInjector
                 var range = GetListFromRange(scanRangeArgument.Value);
                 _logger.LogInformation($"Starting Device Information Scan: server={this.ServerEndPoint}, device-information-range={String.Join(',', range)} ");
 
-                var controller = new ModbusReconnaissanceController(this.ServerEndPoint);
+                var controller = new ModbusReconController(this.ServerEndPoint);
                 await foreach (var result in controller.DeviceIdentificationAsync(range.Select(x=>(DeviceIdentificationObject)x)))
                 {
                     Console.WriteLine($"Information name={result.Name} value={result.Value} status={result.Status}");
@@ -168,6 +169,25 @@ namespace AnomalyInjector
                 return 0;
             });
         }
+
+        private void RunModbusProxyCommand(CommandLineApplication command)
+        {
+            command.Description = "Run simple Modbus Proxy.";
+            command.HelpOption("-?|-h|--help");
+
+            command.Arguments.Add(_modbusServerEndpointArgument);
+            command.OnExecute(async () =>
+            {
+
+                _logger.LogInformation($"Starting Modbus Proxyy: server={this.ServerEndPoint}");
+
+                var controller = new ModbusProxyController(this.ServerEndPoint, (byte)this.DeviceId);
+                await controller.RunProxy(_appLifetime.ApplicationStopping);
+                return 0;
+            });
+        }
+
+
         private int[] GetListFromRange(string value)
         {
             var parts = value.Split(',');

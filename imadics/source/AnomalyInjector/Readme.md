@@ -46,7 +46,7 @@ Attacks are injected by executing the tool with URI of the MODBUS server specifi
 Anomalify.exe [MODBUS-SERVER-URI] [ATTACK-TYPE] [ATTACK-PARAMETERS]
 ```
 
-### A1. Address Scan
+### A1. Address Scan :white_check_mark:
 
 Address scan reconnaissance stands for identification of MODBUS devices on the given IP address. The address range for MODBUS RTU and ASCII systems is the attack parameter. The valid range is 0..247. Value 0 stands for broadcast address. The response may be acknowledgement or an error message.
 
@@ -63,7 +63,7 @@ Anomalify.exe 192.168.111.17:502 Address-Scan 1..100
 ```
 
 
-### A2. Function Code Scan
+### A2. Function Code Scan :white_check_mark:
 
 This attack represents the way to enumerate a list of supported functions of RTU device. An attacker sends a query to all required function codes. MODBUS query payloads vary by function code. However, an attacker need not form a proper payload for each function code to determine if a function code is supported by a MODBUS server. If the function code is not supported an exception code 1 (invalid function code) response will be returned. All other responses, whether indicating an error or transaction success, indicate the function code is supported by the targeted server.
 
@@ -78,7 +78,7 @@ For example:
 Anomalify.exe 192.168.111.17:502/1 Address-Scan 1,2,3,4,5,6 
 ```
 
-### A3. Device Identification 
+### A3. Device Identification :white_check_mark: 
 
 MODBUS servers may provide function code that allows the client to read device identification information. Function code 0x11 allows an attacker to obtain the current run status and other device-specific information. According to the documentation, this is only available for serial lines. MODBUS servers may also implement function code 0x2B to provide access to basic, common, and advanced information.  The basic is mandatory for all MODBUS servers and includes vendor name, product code, and major and minor revisions. This operation implements reading BASIC, COMMON, and ADVANCED information. 
 
@@ -91,6 +91,8 @@ For example:
 ```
 Anomalify.exe 192.168.111.17:502/1 Address-Scan BASIC 
 ```
+
+
 
 ### A4. Naïve Read Payload Size
 An NMRI attack can craft malicious responses which include the correct quantity of returned objects but with preset or randomly generated content.
@@ -170,6 +172,9 @@ For instance, the following command modifies each 10th reply in the communicatio
 Anomalify.exe 192.168.111.17:502/1 Naive-False-ErrorResponse --skip 9
 ```
 
+
+
+
 ### A7. Sporadic Sensor Measurement Injection
 
 ### A8. Calculated Sensor Measurement Injection
@@ -178,11 +183,17 @@ Anomalify.exe 192.168.111.17:502/1 Naive-False-ErrorResponse --skip 9
 
 ### A10. High Frequency Measurement Injection
 
+
+
+
 ### A11. Altered System Control Scheme
 
 ### A12. Altered Actuator State
 
 ### A13. Altered Control Set Point
+
+
+
 
 ### A14. Force Listen Only Mode
 

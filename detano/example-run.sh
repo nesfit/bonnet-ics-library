@@ -5,19 +5,20 @@
 GREEN='\033[0;32m'
 NC='\033[0m'
 
+dir=`pwd`
 cd
 #Download dataset library
 git clone https://github.com/matousp/datasets.git
-cd detano/src
+cd ${dir}/src
 
 echo -e "${GREEN}Example of automata learning -- PA${NC}"
-./pa_learning.py ../../datasets/scada-iec104/iec104-traffic/10122018-104Mega-ioa.csv --atype=pa --format=ipfix
+python3.9 pa_learning.py ~/datasets/scada-iec104/iec104-traffic/10122018-104Mega-ioa.csv --atype=pa --format=ipfix
 
 echo -e "${GREEN}Example of automata learning -- PTA${NC}"
-./pa_learning.py ../../datasets/scada-iec104/iec104-traffic/10122018-104Mega-ioa.csv --atype=pta --format=ipfix
+python3.9 pa_learning.py ~/datasets/scada-iec104/iec104-traffic/10122018-104Mega-ioa.csv --atype=pta --format=ipfix
 
 echo -e "${GREEN}Example of anomaly detection -- Single message reasoning${NC}"
-./anomaly_check.py ../../datasets/scada-iec104/attacks/normal-traffic.csv ../../datasets/scada-iec104/attacks/scanning-attack.csv --atype=pa --format=ipfix --alg=member
+python3.9 anomaly_check.py ~/datasets/scada-iec104/attacks/normal-traffic.csv ~/datasets/scada-iec104/attacks/scanning-attack.csv --atype=pa --format=ipfix --alg=member
 
 echo -e "${GREEN}Example of anomaly detection -- Distribution comparison${NC}"
-./anomaly_check.py ../../datasets/scada-iec104/attacks/normal-traffic.csv ../../datasets/scada-iec104/attacks/scanning-attack.csv --atype=pa --format=ipfix --alg=distr --smoothing
+python3.9 anomaly_check.py ~/datasets/scada-iec104/attacks/normal-traffic.csv ~/datasets/scada-iec104/attacks/scanning-attack.csv --atype=pa --format=ipfix --alg=distr --smoothing

@@ -55,6 +55,7 @@ class AnomDistrComparison(anom.AnomDetectBase):
         self.golden_map = aut_map
         ## Procedure used to obtain a PA from a list of messages
         self.learning_proc = learning_procedure
+        self.test_fa = None
 
 
 
@@ -71,7 +72,7 @@ class AnomDistrComparison(anom.AnomDetectBase):
         return self.golden_map[compair]
 
 
-    def detect(self, window: List, compair: anom.ComPairType) -> List[float]:
+    def detect(self, window: List, compair: anom.ComPairType, accelerate: float = 0.0) -> List[float]:
         """!
         Detect if anomaly occurrs in the given window.
 
@@ -81,7 +82,17 @@ class AnomDistrComparison(anom.AnomDetectBase):
         @return List of floats representing distance between golden automata and a window
         """
         auts = self.dpa_selection(window, compair)
-        return [self.apply_detection(aut, window, compair) for aut in auts]
+        ret = []
+        self.test_fa = self.learning_proc(window)
+
+        for aut in auts:
+            val = self.apply_detection(aut, window, compair)
+            ret.append(val)
+
+            if val <= accelerate:
+                return ret
+
+        return ret
 
 
     def remove_identical(self) -> None:
@@ -101,7 +112,7 @@ class AnomDistrComparison(anom.AnomDetectBase):
         """
         self.remove_identical()
         for k, v in self.golden_map.items():
-            self.golden_map[k] = self._remove_euclid_similar_it(max_error, v)
+            self.golden_map[k] = list(self._remove_euclid_similar_it(max_error, v))
 
 
     def _remove_euclid_similar_it(self, max_error: float, lst: List[core_wfa.CoreWFA]) -> List[core_wfa.CoreWFA]:
@@ -114,7 +125,15 @@ class AnomDistrComparison(anom.AnomDetectBase):
 
         @return List with removed similar automata
         """
-        aut_dist = dict([ ((a,b), AnomDistrComparison.euclid_distance(a,b)) for a in lst for b in lst if a != b ])
+        aut_dist = dict()
+
+        for i in range(len(lst)):
+            for j in range(i+1, len(lst)):
+                a = lst[i]
+                b = lst[j]
+                aut_dist[(a, b)] = AnomDistrComparison.euclid_distance(a,b)
+                aut_dist[(b, a)] = aut_dist[(a, b)]
+
         d = dist.Distance(aut_dist, lst)
         return d.compute_subset_error(max_error)
 
@@ -176,13 +195,12 @@ class AnomDistrComparison(anom.AnomDetectBase):
         if len(window) == 0 and len(aut.get_transitions()) > 1:
             return 1.0
 
-        test_fa = self.learning_proc(window)
         d = None
         try:
-            d = AnomDistrComparison.euclid_distance(aut, test_fa)
+            d = AnomDistrComparison.euclid_distance(aut, self.test_fa)
         except ValueError:
             SPARSE = True
-            d = AnomDistrComparison.euclid_distance(test_fa, aut)
+            d = AnomDistrComparison.euclid_distance(self.test_fa, aut)
             SPARSE = False
         return d
 

@@ -30,7 +30,7 @@ import math
 import wfa.wfa_exceptions as wfa_exceptions
 
 from typing import List, Optional, Set, TypeVar, Generic, Callable
-from collections import deque
+from collections import deque, defaultdict
 
 StateType = TypeVar("StateType")
 SymbolType = TypeVar("SymbolType")
@@ -230,6 +230,15 @@ class CoreWFA(Generic[StateType, SymbolType]):
         self._start = start
 
 
+    def set_alphabet(self, alph: List[SymbolType]) -> None:
+        """!
+        Set the alphabet
+
+        @param alph: New alphabet
+        """
+        self._alphabet = alph
+
+
     def get_alphabet(self) -> List[SymbolType]:
         """!
         Get alphabet used by the WFA. If the alphabet is not explicitly
@@ -238,7 +247,7 @@ class CoreWFA(Generic[StateType, SymbolType]):
         @return List of symbols.
         """
         alph: List[SymbolType] = []
-        if self._alphabet != None:
+        if self._alphabet != None and len(self._alphabet) > 0:
             return self._alphabet
         for transition in self._transitions:
             if transition.symbol not in alph:
@@ -649,3 +658,102 @@ class CoreWFA(Generic[StateType, SymbolType]):
         """
         for tr in self.get_transitions():
             tr.symbol = fnc(tr.symbol)
+
+
+    def get_most_probable_string(self) -> List[SymbolType]:
+        """!
+        Compute the most probable word of the DPA
+
+        @return A word with a highest probability
+        """
+
+        assert(self.is_deterministic())
+
+        val: dict[StateType, float] = defaultdict(lambda: 0.0)
+        words: dict[StateType, List[SymbolType]] = dict()
+
+        if len(self._finals) == 0:
+            return [], 0.0
+
+        for k, v in self._finals.items():
+            val[k] = v
+            words[k] = []
+
+        changed = True
+        while changed:
+            changed = False
+            for tr in self.get_transitions():
+                if val[tr.src] < val[tr.dest]*tr.weight:
+                    val[tr.src] = val[tr.dest]*tr.weight
+                    words[tr.src] = [tr.symbol] + words[tr.dest]
+                    changed = True
+
+        ini = list(self._start.keys())[0]
+        return words[ini], val[ini]
+
+
+    def set_ones(self) -> None:
+        """!
+        Set the weight of all transitions to 1.0
+        """
+
+        for tr in self._transitions:
+            tr.weight = 1.0
+
+
+    def complete_wfa(self, trap: StateType) -> None:
+        """!
+        Complete the automaton. New transitions have the weight 0.0
+
+        @param trap: New trap (sink) state (assuming not to be in the set of states)
+        """
+
+        alphabet = self.get_alphabet()
+        trans = copy.deepcopy(self._transitions)
+
+        succ = dict()
+        for st in self.get_states():
+            for al in alphabet:
+                succ[(st,al)] = False
+
+        for tr in self._transitions:
+            succ[(tr.src,tr.symbol)] = True
+
+        for k, v in succ.items():
+            if not v:
+                trans.append(Transition(k[0], trap, k[1], 0.0))
+
+        for al in alphabet:
+            trans.append(Transition(trap, trap, al, 0.0))
+        self._transitions = trans
+        self._states = self._get_states()
+
+
+    def difference_dwfa(self, diff: "CoreWFA") -> "CoreWFA":
+        """!
+        Compute the difference weighted automaton. First, convert the second
+        automaton to a complete WFA with all transitions 1.0. Then, switch the
+        accepting states to obtain a complementary automaton. Finally, return the
+        product with the original automaton.
+
+        @param diff: Second automaton
+        @return Difference automaton
+        """
+
+        assert(self.is_deterministic())
+        assert(diff.is_deterministic())
+
+        but = copy.deepcopy(diff)
+
+        alp = set(but.get_alphabet() + self.get_alphabet())
+        but.set_alphabet(list(alp))
+        but.complete_wfa(-1)
+        but.set_ones()
+
+        nfin = dict()
+        for st in but.get_states():
+            if st not in but.get_finals():
+                nfin[st] = 1.0
+        but.set_finals(nfin)
+
+        return self.product(but).get_trim_automaton()

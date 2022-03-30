@@ -27,6 +27,7 @@ import csv
 import ast
 import math
 import itertools
+import copy
 from dataclasses import dataclass
 from collections import defaultdict
 from enum import Enum
@@ -35,6 +36,7 @@ from typing import List, Tuple, FrozenSet, Callable, Union
 
 import learning.fpt as fpt
 import learning.alergia as alergia
+import wfa.core_wfa as core_wfa
 import wfa.core_wfa_export as core_wfa_export
 import wfa.matrix_wfa as matrix_wfa
 import parser.IEC104_parser as con_par
@@ -48,6 +50,7 @@ SPARSE = False
 rows_filter_normal = ["asduType", "cot"]
 DURATION = 300
 AGGREGATE = True
+ACCELERATE = False
 
 
 ComPairType = FrozenSet[Tuple[str,str]]
@@ -72,6 +75,17 @@ class AutType(Enum):
 class InputFormat(Enum):
     IPFIX = 0
     CONV = 1
+
+
+"""!
+Details about the anomalies
+"""
+@dataclass
+class AnomDetails:
+    bad_conv : List
+    test_aut : core_wfa.CoreWFA
+    model_aut : core_wfa.CoreWFA
+
 
 """
 Program parameters
@@ -130,11 +144,18 @@ def ent_format(k: ComPairType) -> str:
     return "{0}:{1} -- {2}:{3}".format(fip, fp, sip, sp)
 
 
+def conv_format(conv: List) -> str:
+    return "".join([str(elem) for elem in conv])
+
+
 """
 Convert a list of conversations into a string
 """
 def conv_list_format(l: List) -> str:
-    return "\n".join([str(elem) for elem in l])
+    ret = str()
+    for num, sym in enumerate(l):
+        ret += "{0}. {1}\n".format(num+1, conv_format(sym))
+    return ret
 
 
 """
@@ -293,16 +314,23 @@ def main():
         anom_member = mem.AnomMember(golden_map_member, learn_proc)
     res = defaultdict(lambda: [])
     test_com = test_parser.split_communication_pairs()
+    last = 0
+    acc = par.threshold if ACCELERATE and par.threshold is not None else 0.0
+
     for item in test_com:
         cnt = 0
-        for window in item.split_to_windows(DURATION):
+        wns = item.split_to_windows(DURATION)
+        for window in wns:
             window.parse_conversations()
-            r = anom.detect(window.get_all_conversations(abstraction), item.compair)
+            r = anom.detect(window.get_all_conversations(abstraction), item.compair, acc)
             res[item.compair].append(r)
+            last = max(cnt, last)
             if (par.alg == Algorithms.DISTR) and (par.threshold is not None):
                 if min(r) > par.threshold:
-                    r = anom_member.detect(window.get_all_conversations(abstraction), item.compair)
-                    anomalies[item.compair][cnt] = r[0]
+                    ind = r.index(min(r))
+                    model = anom.golden_map[item.compair][ind]
+                    mem_det = anom_member.apply_detection(model, window.get_all_conversations(abstraction), item.compair)
+                    anomalies[item.compair][cnt] = AnomDetails(mem_det, copy.deepcopy(anom.test_fa), copy.deepcopy(anom.golden_map[item.compair][ind]))
             cnt += 1
 
     print("Detection results: ")
@@ -313,20 +341,41 @@ def main():
 
         if par.alg == Algorithms.DISTR:
             for i in range(len(v)):
+                if i == last:
+                    continue
                 if AGGREGATE:
                     print("{0};{1}".format(i, min(v[i])))
                 else:
                     print("{0};{1}".format(i, v[i]))
         elif par.alg == Algorithms.MEMBER:
             for i in range(len(v)):
+                if i == last:
+                    continue
                 print("{0};{1}".format(i, [ it for its in v[i] for it in its ]))
 
     if (par.alg == Algorithms.DISTR) and (par.threshold is not None):
         print("\nPossibly problematic conversations: ")
         for ent, windows in anomalies.items():
-            for i, conv in windows.items():
+            for i, det in windows.items():
+                if i == last:
+                    continue
                 print("Communicating: {0}; Window: {1}".format(ent_format(ent), i))
-                print(conv_list_format(conv))
+
+                print("Bad conversations:")
+                tmp = [k for k,v in itertools.groupby(sorted(det.bad_conv))]
+                print(conv_list_format(tmp))
+
+                #aut = det.model_aut
+                #aut.__class__ = core_wfa_export.CoreWFAExport
+                #print(aut.to_dot())
+
+                print("Missing conversation:")
+                if det.model_aut is None:
+                    print("empty model")
+                else:
+                    word, pr = det.model_aut.difference_dwfa(det.test_aut).get_most_probable_string()
+                    print(conv_format(word), pr)
+
                 print()
 
 

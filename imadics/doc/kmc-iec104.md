@@ -6,6 +6,7 @@ In this document, the application of this method to IEC104 IPFIX is specified.
 
 ## IEC104 IPFIX Records
 
+The IPFIX record for IEC104 is computed for each ASDU and consists of the following fields: 
 | Field | Meaning |
 | -- | ------ |
 | BYTES | |
@@ -44,7 +45,8 @@ and re-sent.
 * One ASDU can transmits several objects, however, these objects must have the same COT. 
 * One TCP packet can contain several ASDUs with same or different COTs. 
 
-Considering the above observations and based on the availability of information provided by IEC IPFIX template the following key fields were defined:
+The model of communication is created by aggregating IEC IPFIX records using the key fields that represents flow and computing statistics of
+the operations. The key fields of flows are as follows:
 
 | Flow Key Fields |
 | ----------- |
@@ -56,13 +58,15 @@ Considering the above observations and based on the availability of information 
 
 L3 and L4 fields determines source and destination hosts of IEC conversations and together with IEC104_ASDU_ADDRESS they identify the IEC conversation. 
 
-The column fields contains values that represents keys for the counters. As the number of possible values can be large we need to represent them compactly. 
+To compute statistics we identify the different operations. The all possible operations are represented by cartesian product of the following fields:
 
 | Column Fields |
 | ---------------- |
 | IEC104_FRAME_FMT |
 | IEC104_ASDU_COT |
 | IEC104_ASDU_TYPE_IDENT |
+
+As the product may be large some reduction is required as discussed in the next section.
 
 Given IEC fields determine the frame type, requested operation/result and the element types. In direct representation, for each valid 
 combination of column field we provide the following counters:
@@ -78,12 +82,7 @@ combination of column field we provide the following counters:
 ## Converting IEC IPFIX records to KMC input
 
 The KMC method assumes that a single input record represents a conversation in terms of its statistical properties such as a number of different operations.
-Given that flow is defined by Flow Key Fields the content of the input record consists of a collection of key-value pairs. The key is composed of Column Fields using concatenation. 
-The value consists of a Value Fields structure comprised of four counters.
 
-TODO: One-hot encoding?
-
-TODO: Some other more compact representation?
 
 ## Example
 In this section, an example is provided to demonostrate the describe principle of IEC IPFIX for KMC.
@@ -94,3 +93,4 @@ TODO: Provide an example.
 
 * https://www.fit.vut.cz/research/publication-file/11570/TR-IEC104.pdf
 
+* https://towardsdatascience.com/encoding-categorical-variables-one-hot-vs-dummy-encoding-6d5b9c46e2db

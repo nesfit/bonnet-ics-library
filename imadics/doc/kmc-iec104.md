@@ -77,7 +77,7 @@ The last group of IPFIX fields is a collection of counters:
 | IEC104_PKT_LENGTH |
 | IEC104_ASDU_NUM_ITEMS | 
 
-There are general counters that stands for bytes, packets and IEC specific counter, which provide IEC packet length and number of items affected by the operation. 
+There are general counters of bytes and packets, and IEC-specific counters, which provide IEC packet length and the number of items affected by the operation. 
 
 ## Converting IEC IPFIX records to IEC KMC records
 

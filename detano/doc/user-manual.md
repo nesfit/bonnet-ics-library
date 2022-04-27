@@ -1,25 +1,4 @@
-# Automata-based Detection of Network Anomalies
-
-Detano toolsuite is tailored for learning probabilistic automata (Alergia
-algorithm with extensions) and anomaly detection in ICS networks based on
-probabilistic automata.
-
-### Installation
-
-To run the tools you need to have installed `Python 3.9` or higher with the following packages
-- `dataclasses`
-- `bidict`
-- `bitarray`
-- `numpy`
-- `scipy`
-- `FAdo` for Python 3
-
-These packages you can install using the `pip3` util. Or you can use the
-provided `requirements.txt` file (all dependencies can be installed via `pip3
-install -r requirements.txt`). In order to generate the documentation, run
-`doxygen` in the `doc` folder.
-
-### Tool Support Overview
+# User Manual
 
 All tools in the suite works with probabilistic automata obtained from a list of
 messages (packets) divided into *conversations* (messages that logically belong
@@ -163,34 +142,3 @@ The output shows used learning parameters, the number of states of the learned
 DPA and the accuracy. The learning uses first 33 % of the input traffic for
 learning and the rest for accuracy evaluation (this value can be changed
 directly in the file `pa_learning.py`).
-
-
-### Automata Format
-
-PAs are specified using a format, which given as follows.
-```
-<initial state>
-(<source state> <destination state> <symbol> <probability>)*
-(<final state> <probability>)*
-```
-
-### Structure of the Repository
-
-- `src` Source codes of the tool support
-- `doc` Source code documentation
-- `experimental` scripts for evaluation
-
-### Publications
-
-The tool suite is based on the following papers:
-
-* **Efficient Modelling of ICS Communication For Anomaly Detection Using Probabilistic Automata**. Petr Matoušek, Vojtěch Havlena, and Lukáš Holík. In *Proceedings of IFIP/IEEE International Symposium on Integrated Network
-Management*. ISBN 978-3-903176-32-4. 2021
-([pdf](http://dl.ifip.org/db/conf/im/im2021/210993.pdf))
-
-### Contact
-
-If you have a question, do not hesitate to contact the authors:
-- Vojtěch Havlena `<ihavlena at fit.vutbr.cz>`
-- Petr Matoušek `<matousp at fit.vutbr.cz>`
-- Lukáš Holík `<holik at fit.vutbr.cz>`

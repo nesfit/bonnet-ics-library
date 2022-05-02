@@ -38,6 +38,11 @@
       "commandName": "Project",
       "commandLineArgs": "test-flows -R \"lemay\\attack\\characterization_modbus_6RTU_with_operate.flows.csv\" -p \"profiles\\6RTU_with_operate.profile.zip\" -f csv > \"results\\6RTU_with_operate.csv\"",
       "workingDirectory": "$(SolutionDir)data\\modbus"
+    },
+    "iec-build-profile-flows": {
+      "commandName": "Project",
+      "commandLineArgs": "Build-Profile -R \"bonnet\\normal-traffic.csv\" -t \"00:01:00\" -c 60 -m Centroids -p Iec  -w \"profiles\\iec_normal_traffic.profile.zip\"",
+      "workingDirectory": "$(SolutionDir)data\\iec"
     }
   }
 }

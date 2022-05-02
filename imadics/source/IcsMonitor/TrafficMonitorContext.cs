@@ -6,6 +6,7 @@ using SharpPcap;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -205,7 +206,7 @@ namespace IcsMonitor
                 var featureColumns = customFeatureColumns ?? dataViewSource.FeatureColumns;
 
                 _logger.LogInformation($"Computing profile.");
-                var profile = CreateProfile($"{protocolType}", protocolType, windowTimeSpan, _mlContext, featureColumns, dataview);
+                var profile = CreateProfile($"{protocolType}", protocolType, windowTimeSpan, _mlContext, featureColumns.ToArray(), dataview);
                 _logger.LogInformation($"Saving profile to {outputProfileFile}.");
                 profile.SaveToFile(outputProfileFile);
                 _logger.LogInformation($"Done.");
@@ -230,7 +231,7 @@ namespace IcsMonitor
                     var featureColumns = customFeatureColumns ?? dataViewSource.FeatureColumns;
 
                     _logger.LogInformation($"Computing profile.");
-                    var profile = CreateProfile($"{protocolType}", protocolType, windowTimeSpan, _mlContext, featureColumns, dataview);
+                    var profile = CreateProfile($"{protocolType}", protocolType, windowTimeSpan, _mlContext, featureColumns.ToArray(), dataview);
                     _logger.LogInformation($"Saving profile to {outputProfileFile}.");
                     profile.SaveToFile(outputProfileFile);
                     _logger.LogInformation($"Done.");

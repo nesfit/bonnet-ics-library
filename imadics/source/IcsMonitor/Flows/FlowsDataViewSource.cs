@@ -1,5 +1,6 @@
 ﻿using IcsMonitor.AnomalyDetection;
 using IcsMonitor.Modbus;
+using IcsMonitor.Protocols;
 using Microsoft.ML;
 using PacketDotNet;
 using SharpPcap;
@@ -30,17 +31,15 @@ namespace IcsMonitor.Flows
             return protocolType switch
             {
                 IndustrialProtocol.Modbus => new ModbusDataViewSource(),
-                IndustrialProtocol.Dnp3 => throw new NotImplementedException(),
-                IndustrialProtocol.S7 => throw new NotImplementedException(),
-                IndustrialProtocol.Mqtt => throw new NotImplementedException(),
-                IndustrialProtocol.Coap => throw new NotImplementedException(),
+                IndustrialProtocol.Iec => new IecDataViewSource(),
+                IndustrialProtocol.Goose => throw new NotImplementedException(),
                 _ => throw new NotImplementedException(),
             };
         }
         /// <summary>
         /// Collection of column names that are used to compute Features vector.
         /// </summary>
-        public abstract string[] FeatureColumns { get; }
+        public abstract IReadOnlyCollection<string> FeatureColumns { get; }
 
         /// <summary>
         /// Loads packets and optionally labels from the input packet capture file and label file, respectively.

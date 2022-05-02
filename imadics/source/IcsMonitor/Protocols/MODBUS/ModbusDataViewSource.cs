@@ -11,7 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Traffix.Core.Flows;
 using Traffix.Core.Observable;
-using Traffix.Providers.PcapFile;
 
 namespace IcsMonitor.Modbus
 {
@@ -23,7 +22,7 @@ namespace IcsMonitor.Modbus
         const int ModbusPort = 502;
 
         /// <inheritdoc/>
-        public override string[] FeatureColumns => new[] {
+        public override IReadOnlyCollection<string> FeatureColumns => new[] {
                 "ForwardMetricsDuration", "ForwardMetricsPackets", "ForwardMetricsOctets", "ReverseMetricsDuration", "ReverseMetricsPackets",
                 "ReverseMetricsOctets", "DataReadRequests", "DataWriteRequests", "DataDiagnosticRequests", "DataOtherRequests",
                 "DataUndefinedRequests", "DataMalformedRequests", "DataResponsesSuccess", "DataResponsesError", "DataMalformedResponses" };

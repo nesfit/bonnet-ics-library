@@ -42,12 +42,10 @@ namespace IcsMonitor
                 "An output file name to store the profile. This option is required.",
                 CommandOptionType.SingleValue);
 
-
-
             command.OnExecute(async () =>
             {
                 if (!anomalyDetectionMethodOption.TryParseValueOrError<AnomalyDetectionMethod>(EnumTryParse, () => Console.Error.WriteLine($"Error: '--{anomalyDetectionMethodOption.LongName}' option is required!"), _ => Console.Error.WriteLine("Input error: Invalid method name!"), out var anomalyDetectionMethod)) return -1;
-                if (!protocolTypeOption.TryParseValueOrError<IndustrialProtocol>(EnumTryParse, () => Console.Error.WriteLine("Input error: rotocol type must be specified!"), _ => Console.Error.WriteLine("Input error: Invalid protocol type specified!"), out var protocolType)) return -1;
+                if (!protocolTypeOption.TryParseValueOrError<IndustrialProtocol>(EnumTryParse, () => Console.Error.WriteLine("Input error: protocol type must be specified!"), _ => Console.Error.WriteLine("Input error: Invalid protocol type specified!"), out var protocolType)) return -1;
                 if (!windowSizeOption.TryParseValueOrDefault(TimeSpan.TryParse, TimeSpan.FromMinutes(5), _ => Console.Error.WriteLine("Input error: Invalid type span specified. Required format is HH:MM:SS.ff"), out var windowTimeSpan)) return -1;
                 if (!windowCountOption.TryParseValueOrDefault(Int32.TryParse, (int)Int16.MaxValue, _ => Console.Error.WriteLine("Input error: Invalid value specified. Required is integer value."), out var windowCount)) return -1;
                 if (!outputFileOption.TryGetValueOrError(() => Console.Error.WriteLine($"Error: '--{outputFileOption.LongName}' option is required!"), out var outputProfileFile)) return -1;

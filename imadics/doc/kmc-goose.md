@@ -102,12 +102,12 @@ In general, each GOOSE IPFIX record is transformed to an intermediate record by 
 by omitting unused fileds and operation fields.  
 
 To create an input for the KMC, we need to aggregate the individual GOOSE KMC records. An aggregation use 
-`L3_IPV6_SRC`, `L3_IPV6_DST` and `GOOSE_APPID` as the compound key and applies SUM operation on other fields. It will yield to the following aggregated conversation record:
+`L3_IPV6_SRC`, `L3_IPV6_DST` and `GOOSE_APPID` as the compound key and applies SUM operation on other fields. It will yield to the following aggregated conversation records:
 
 | BYTES | PACKETS | START_SEC | END_SEC | L3_PROTO | BYTES_A | PACKETS_A | L3_IPV6_SRC | L3_IPV6_DST | GOOSE_APPID | D78C4C3D_BYTES | D78C4C3D_PACKETS | F530A646_BYTES | F530A646_PACKETS |
 | ----- | ------- | --------- | ------- | -------- | ------- | --------- | ----------- | ----------- | ----------- | -------------- | ---------------- | -------------- | ---------------- | 
-| 41404 | 208 | 2021-11-26 14:39:21.535568830 | 2021-11-26 14:42:46.667508761 | 6 | 41404 | 208 | fe80::221:c1ff:fe25:8a2 | ff02::10c:cd01:0:0 | 1 | 4144 | 28 | 37260 | 180 |
-
+| 4144 | 28 | 2021-11-26 14:39:21.535568830 | 2021-11-26 14:42:46.667508761 | 6 | 41404 | 28 | fe80::221:c1ff:fe25:8a2 | ff02::10c:cd01:0:0 | 1 | 4144 | 28 | 0 | 0 |
+| 37260 | 180 | 2021-11-26 14:39:21.535568830 | 2021-11-26 14:42:46.667508761 | 6 | 37260 | 180 | fe80::221:c1ff:fe25:8a2 | ff02::10c:cd01:0:1 | 1 | 0 | 0 | 37260 | 180 |
 
 The KMC method can accept input that can have many feature columns as it preprocess the input with PCA to reduce dimensionality before clustering is perfomed. Thus, if there are tens or even hundreds of input feature columns the application of PCA reduce them to specified number of dimensions (default is 3).
 

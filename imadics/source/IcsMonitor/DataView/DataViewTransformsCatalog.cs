@@ -14,8 +14,10 @@ namespace Traffix.DataView
         /// <param name="featureColumnName">The name of the resulting feature vector column.</param>
         /// <param name="sourceColumns">The array of source columns.</param>
         /// <returns>The transformer that can be a part of the ML pipeline.</returns>
-        public static EstimatorChain<ColumnConcatenatingTransformer> CreateFeatureVector(this TransformsCatalog transforms, string featureColumnName, params string[] sourceColumns)
+        public static EstimatorChain<ColumnConcatenatingTransformer> CreateFeatureVector(this TransformsCatalog transforms, DataViewSchema schema, string featureColumnName, params string[] sourceColumns)
         {
+            var dataviewType = schema.First().Type;
+
             var convertors = sourceColumns.Select(columnName => transforms.Conversion.ConvertType(columnName, outputKind: DataKind.Single));
             var pipeline = convertors.Aggregate(new EstimatorChain<TypeConvertingTransformer>(), (x, y) => x.Append(y)).Append(transforms.Concatenate(featureColumnName, sourceColumns));
             return pipeline;

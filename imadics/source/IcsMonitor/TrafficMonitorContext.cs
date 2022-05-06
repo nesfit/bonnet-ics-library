@@ -64,7 +64,7 @@ namespace IcsMonitor
         /// <param name="textWriter">The output writer.</param>
         public async Task WatchTrafficAsync(SharpPcap.ICaptureDevice device, TrafficProfile profile, OutputFormat outputFormat, TextWriter textWriter, CancellationToken cancellationToken)
         {
-            var dataViewSource = FlowsDataViewSource.GetSource(profile.ProtocolType);
+            var dataViewSource = profile.GetSource();
 
             _logger.LogInformation($"Open device {device.Name}.");
             device.Open();
@@ -106,7 +106,6 @@ namespace IcsMonitor
             return Task.Run(TestFlowsAction);
             void TestFlowsAction()
             {
-
                 var dataViewSource = FlowsDataViewSource.GetSource(profile.ProtocolType);
                 var dataview = dataViewSource.LoadFromCsvFile(_mlContext, flowsFile);
                 var scoring = profile.Transform(dataview);
@@ -155,13 +154,15 @@ namespace IcsMonitor
         /// <summary>
         /// Creates the profile from the source data and provided options.
         /// </summary>
-        private TrafficProfile CreateProfile(string profileName, IndustrialProtocol protocolType, TimeSpan windowTimeSpan, MLContext mlContext, string[] featureColumns, IDataView sourceData)
+        private TrafficProfile CreateProfile(string profileName, IndustrialProtocol protocolType, TimeSpan windowTimeSpan, MLContext mlContext, string[] featureColumns, IDataView sourceData, Dictionary<string,string> configuration)
         {
             _logger.LogInformation($"Training profile on input data.");
-            var trainer = new TrafficProfileTrainer(mlContext, 3, protocolType, featureColumns, windowTimeSpan);
-            var profile = trainer.Fit(Path.GetFileNameWithoutExtension(profileName), sourceData, Clusters, ModelCount);
+            var trainer = new TrafficProfileTrainer(mlContext, PcaRank, protocolType, featureColumns, windowTimeSpan);
+            var profile = trainer.Fit(Path.GetFileNameWithoutExtension(profileName), sourceData, Clusters, ModelCount, configuration);
             return profile;
         }
+
+        public int PcaRank { get; set; } = 3;
 
         /// <summary>
         /// A number of models that comprise the profile.
@@ -197,6 +198,7 @@ namespace IcsMonitor
                 }
 
                 _logger.LogInformation($"Creating profile for {device.Name}.");
+                var configuration = new List<KeyValuePair<string, string>>();
                 var dataViewSource = FlowsDataViewSource.GetSource(protocolType);
 
                 device.Open();
@@ -206,7 +208,7 @@ namespace IcsMonitor
                 var featureColumns = customFeatureColumns ?? dataViewSource.FeatureColumns;
 
                 _logger.LogInformation($"Computing profile.");
-                var profile = CreateProfile($"{protocolType}", protocolType, windowTimeSpan, _mlContext, featureColumns.ToArray(), dataview);
+                var profile = CreateProfile($"{protocolType}", protocolType, windowTimeSpan, _mlContext, featureColumns.ToArray(), dataview, null);
                 _logger.LogInformation($"Saving profile to {outputProfileFile}.");
                 profile.SaveToFile(outputProfileFile);
                 _logger.LogInformation($"Done.");
@@ -216,6 +218,15 @@ namespace IcsMonitor
                 _logger.LogError($"{e.Message}");
             }
         }
+        /// <summary>
+        /// Builds traffic profile from the provided CSV file that contains normal flows.
+        /// </summary>
+        /// <param name="flowFilePath">Path to CSV flow file.</param>
+        /// <param name="protocolType">The type of industrial protocol.</param>
+        /// <param name="windowTimeSpan">Window span used to aggregate flow information.</param>
+        /// <param name="customFeatureColumns">Custom features. Ca be null to use the default features.</param>
+        /// <param name="outputProfileFile">The profile file name.</param>
+        /// <returns>The task that completes after a profile is built and written to an output file.</returns>
         public Task BuildProfileAsync(string flowFilePath, IndustrialProtocol protocolType, TimeSpan windowTimeSpan, string[] customFeatureColumns, string outputProfileFile)
         {
             return Task.Run(BuildProfileAction);
@@ -231,7 +242,7 @@ namespace IcsMonitor
                     var featureColumns = customFeatureColumns ?? dataViewSource.FeatureColumns;
 
                     _logger.LogInformation($"Computing profile.");
-                    var profile = CreateProfile($"{protocolType}", protocolType, windowTimeSpan, _mlContext, featureColumns.ToArray(), dataview);
+                    var profile = CreateProfile($"{protocolType}", protocolType, windowTimeSpan, _mlContext, featureColumns.ToArray(), dataview, dataViewSource.Configuration);
                     _logger.LogInformation($"Saving profile to {outputProfileFile}.");
                     profile.SaveToFile(outputProfileFile);
                     _logger.LogInformation($"Done.");

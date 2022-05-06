@@ -1,5 +1,7 @@
 ﻿using Microsoft.ML;
+using Microsoft.ML.Data;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Traffix.DataView;
 
@@ -15,6 +17,7 @@ namespace IcsMonitor.AnomalyDetection
         private readonly IndustrialProtocol _protocolType;
         private readonly string[] _featureColumns;
         private readonly TimeSpan _windowTimeSpan;
+        private readonly string[] _tags;
 
         /// <summary>
         /// Creates a new instance of the trainer.
@@ -22,14 +25,17 @@ namespace IcsMonitor.AnomalyDetection
         /// <param name="ml">The ML.NET context.</param>
         /// <param name="pcaRank">The rank of the PCA space.</param>
         /// <param name="protocolType">The target protocol type.</param>
+        /// <param name="featureColumns">Defines columns that contains features used in the model.</param>
         /// <param name="windowTimeSpan">The size of time window used for aggregating the input data.</param>
-        public TrafficProfileTrainer(MLContext ml, int pcaRank, IndustrialProtocol protocolType, string[] featureColumns, TimeSpan windowTimeSpan)
+        /// <param name="tags">For some protocol, the model contains dynamic tags.</param>
+        public TrafficProfileTrainer(MLContext ml, int pcaRank, IndustrialProtocol protocolType, string[] featureColumns, TimeSpan windowTimeSpan, string[] tags = null)
         {
             _ml = ml;
             _pcaAxes = Enumerable.Range(1, pcaRank).Select(i => $"pca{i}").ToArray();
             _protocolType = protocolType;
             _featureColumns = featureColumns;
             _windowTimeSpan = windowTimeSpan;
+            _tags = tags;
         }
         /// <summary>
         /// Gets the input data transformer fitted to the provided Dataview.
@@ -42,7 +48,17 @@ namespace IcsMonitor.AnomalyDetection
         /// <returns>The transformer for input data transformation fitted to the provided Dataview.</returns>
         public ITransformer GetTransformer(IDataView dataview)
         {
-            var trainer = _ml.Transforms.CreateFeatureVector("PreFeatures", _featureColumns)
+            // test that _featureColumns contains only Single values...
+            foreach(var col in _featureColumns)
+            {
+                var colType = dataview.Schema.Last(x => x.Name == col).Type;
+                if (colType == NumberDataViewType.Single) continue;
+                if (colType is VectorDataViewType) continue;
+
+                throw new ArgumentException($"Invalid feature type: Feature column '{col}' must have type Single or Vector<Single> in {nameof(dataview)}.");
+            }
+            var trainer = _ml.Transforms
+                            .Concatenate("PreFeatures", _featureColumns)
                             .Append(_ml.Transforms.NormalizeMinMax("PreFeatures", fixZero: true))
                             .Append(_ml.Transforms.ProjectToPrincipalComponents("Features", "PreFeatures", rank: _pcaAxes.Length));
             var transform = trainer.Fit(dataview);
@@ -60,7 +76,7 @@ namespace IcsMonitor.AnomalyDetection
         /// <param name="clusterCountVector">An array of cluster count values.</param>
         /// <param name="maxModelCount">The required number of models in the profile.</param>
         /// <returns>The profile for the traffic.</returns>
-        public TrafficProfile Fit(string profileName, IDataView dataview, int[] clusterCountVector, int maxModelCount)
+        public TrafficProfile Fit(string profileName, IDataView dataview, int[] clusterCountVector, int maxModelCount, Dictionary<string, string> configuration)
         {
             var transform = GetTransformer(dataview);
             var trainData = transform.Transform(dataview);
@@ -68,7 +84,7 @@ namespace IcsMonitor.AnomalyDetection
             var models = clusterCountVector.Select(n => GetModel(trainer, trainData, n)).Where(x => x != null);
             var modelMetrics = models.Select(m => m.Evaluate(_ml, trainData));
             var bestModels = models.OrderBy(m => m.Evaluate(_ml, trainData).DaviesBouldinIndex).Take(maxModelCount);
-            return new TrafficProfile(_ml, bestModels.ToArray(), dataview.Schema, transform, new TrafficProfile.Settings { ProtocolType = _protocolType, WindowTimeSpan = _windowTimeSpan, ProfileName = profileName });
+            return new TrafficProfile(_ml, bestModels.ToArray(), dataview.Schema, transform, new TrafficProfile.Settings { ProtocolType = _protocolType, WindowTimeSpan = _windowTimeSpan, ProfileName = profileName, Configuration = configuration });
         }
         /// <summary>
         /// Computes the <see cref="ClusterModel"/> using the given trainer and source data. 

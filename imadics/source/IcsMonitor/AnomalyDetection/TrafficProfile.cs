@@ -1,4 +1,5 @@
-﻿using IcsMonitor.Utils;
+﻿using IcsMonitor.Flows;
+using IcsMonitor.Utils;
 using Microsoft.ML;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,7 @@ namespace IcsMonitor.AnomalyDetection
             public IndustrialProtocol ProtocolType { get; set; }
             public TimeSpan WindowTimeSpan { get; set; }
             public int ModelCount { get; set; }
+            public Dictionary<string, string> Configuration { get; set; }
         }
 
 
@@ -36,13 +38,16 @@ namespace IcsMonitor.AnomalyDetection
         private readonly DataViewSchema _inputSchema;
         private readonly Settings _settings;
 
+        public IReadOnlyCollection<KeyValuePair<string, string>> Configuration => _settings.Configuration;
+            
+
         /// <summary>
         /// Creates a new profile from the given parameters.
         /// </summary>
         /// <param name="ml">The ML.NET context.</param>
         /// <param name="models">An array fo models.</param>
         /// <param name="inputSchema">The input schema.</param>
-        /// <param name="inputTransformer">The input data transformer.</param>
+        /// <param name="inputTransformer">The input data transformer, which is applied to input data before the classifier.</param>
         /// <param name="settings">The settings.</param>
         internal TrafficProfile(MLContext ml, ClusterModel[] models, DataViewSchema inputSchema, ITransformer inputTransformer, Settings settings)
         {
@@ -53,6 +58,10 @@ namespace IcsMonitor.AnomalyDetection
             _settings = settings;
             _settings.ModelCount = models.Length;
             
+        }
+        public FlowsDataViewSource GetSource()
+        {
+            return FlowsDataViewSource.GetSource(ProtocolType);
         }
 
         /// <summary>

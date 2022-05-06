@@ -32,7 +32,7 @@ namespace IcsMonitor.Modbus
         public TimeSpan WindowDuration;
 
         /// <summary>
-        /// The labe of the flow. Can be used for classification. 
+        /// The label of the flow. Can be used for classification. 
         /// </summary>
         [LoadColumn(3)]
         [ColumnName("FlowLabel")]

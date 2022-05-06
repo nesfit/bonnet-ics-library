@@ -20,18 +20,26 @@ namespace IcsMonitor.Flows
     /// </summary>
     public abstract class FlowsDataViewSource
     {
+        protected Dictionary<string, string> _configuration;
+
+        protected FlowsDataViewSource(IDictionary<string, string> configuration)
+        {
+
+            this._configuration = configuration != null ? new Dictionary<string, string>(configuration) : new Dictionary<string,string>();
+        }
+
         /// <summary>
         /// Factory method that gets the particular flow source for the given <paramref name="protocolType"/>.
         /// </summary>
         /// <param name="protocolType">The type of the protocol.</param>
         /// <returns>A flow source object for the specific <paramref name="protocolType"/>.</returns>
         /// <exception cref="NotImplementedException"></exception>
-        public static FlowsDataViewSource GetSource(IndustrialProtocol protocolType)
+        public static FlowsDataViewSource GetSource(IndustrialProtocol protocolType, IDictionary<string, string> configuration = null)
         {
             return protocolType switch
             {
-                IndustrialProtocol.Modbus => new ModbusDataViewSource(),
-                IndustrialProtocol.Iec => new IecDataViewSource(),
+                IndustrialProtocol.Modbus => new ModbusDataViewSource(configuration),
+                IndustrialProtocol.Iec => new IecDataViewSource(configuration),
                 IndustrialProtocol.Goose => throw new NotImplementedException(),
                 _ => throw new NotImplementedException(),
             };
@@ -40,6 +48,7 @@ namespace IcsMonitor.Flows
         /// Collection of column names that are used to compute Features vector.
         /// </summary>
         public abstract IReadOnlyCollection<string> FeatureColumns { get; }
+        public Dictionary<string, string> Configuration => _configuration;
 
         /// <summary>
         /// Loads packets and optionally labels from the input packet capture file and label file, respectively.
@@ -138,6 +147,9 @@ namespace IcsMonitor.Flows
     /// <typeparam name="TInput">The type of input object that this data source can process.</typeparam>
     public abstract class FlowsDataViewSource<TInput, TRecord> : FlowsDataViewSource
     {
+        protected FlowsDataViewSource(IDictionary<string, string> configuration) : base(configuration)
+        {
+        }
 
         public override Task<IDataView> LoadAndAggregateAsync<TKey>(MLContext mlContext, string inputCaptureFile, string inputLabelFile, TimeSpan windowTimeSpan, Func<FlowKey, TKey> getKey, CancellationToken cancellationToken)
         {

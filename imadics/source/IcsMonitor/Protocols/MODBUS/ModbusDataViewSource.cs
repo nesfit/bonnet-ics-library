@@ -21,6 +21,11 @@ namespace IcsMonitor.Modbus
     {
         const int ModbusPort = 502;
 
+        public ModbusDataViewSource(IDictionary<string, string> configuration) : base(configuration)
+        {
+
+        }
+
         /// <inheritdoc/>
         public override IReadOnlyCollection<string> FeatureColumns => new[] {
                 "ForwardMetricsDuration", "ForwardMetricsPackets", "ForwardMetricsOctets", "ReverseMetricsDuration", "ReverseMetricsPackets",

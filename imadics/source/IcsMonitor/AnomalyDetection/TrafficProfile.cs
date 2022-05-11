@@ -38,7 +38,7 @@ namespace IcsMonitor.AnomalyDetection
         private readonly DataViewSchema _inputSchema;
         private readonly Settings _settings;
 
-        public IReadOnlyCollection<KeyValuePair<string, string>> Configuration => _settings.Configuration;
+        public IDictionary<string, string> Configuration => _settings.Configuration;
             
 
         /// <summary>

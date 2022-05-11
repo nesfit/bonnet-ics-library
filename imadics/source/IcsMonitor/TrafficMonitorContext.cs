@@ -106,7 +106,7 @@ namespace IcsMonitor
             return Task.Run(TestFlowsAction);
             void TestFlowsAction()
             {
-                var dataViewSource = FlowsDataViewSource.GetSource(profile.ProtocolType);
+                var dataViewSource = FlowsDataViewSource.GetSource(profile.ProtocolType, profile.Configuration);
                 var dataview = dataViewSource.LoadFromCsvFile(_mlContext, flowsFile);
                 var scoring = profile.Transform(dataview);
                 var outputFileWriter = DataViewWriterFactory.CreateWriter(outputFormat, textWriter, scoring.Schema);
@@ -138,8 +138,11 @@ namespace IcsMonitor
         {
             captureDevice.Open();
             long windowCount = Math.Min((long)Math.Ceiling(timeOut / windowTimeSpan), Int32.MaxValue);
-
-            var dataViewSource = FlowsDataViewSource.GetSource(protocolType);
+            var configuration = new Dictionary<string, string>()
+                    {
+                        { "window", windowTimeSpan.ToString()}
+                    };
+            var dataViewSource = FlowsDataViewSource.GetSource(protocolType, configuration);
             var dataview = await dataViewSource.ReadAllAndAggregateAsync(_mlContext, captureDevice, windowTimeSpan, (int)windowCount, AggregatorKey.Multiflow, null, cancellationToken);
             if (cancellationToken.IsCancellationRequested) return;
 
@@ -198,8 +201,11 @@ namespace IcsMonitor
                 }
 
                 _logger.LogInformation($"Creating profile for {device.Name}.");
-                var configuration = new List<KeyValuePair<string, string>>();
-                var dataViewSource = FlowsDataViewSource.GetSource(protocolType);
+                var configuration = new Dictionary<string, string>()
+                    {
+                        { "window", windowTimeSpan.ToString()}
+                    };
+                var dataViewSource = FlowsDataViewSource.GetSource(protocolType, configuration);
 
                 device.Open();
                 var dataview = await dataViewSource.ReadAllAndAggregateAsync(_mlContext, device, windowTimeSpan, windowCount, AggregatorKey.Multiflow, OnNextWindow, cancellationToken);
@@ -236,7 +242,11 @@ namespace IcsMonitor
                 try
                 {
                     _logger.LogInformation($"Loading flows from {flowFilePath}.");
-                    var dataViewSource = FlowsDataViewSource.GetSource(protocolType);
+                    var configuration = new Dictionary<string, string>()
+                    {
+                        { "window", windowTimeSpan.ToString()}
+                    };
+                    var dataViewSource = FlowsDataViewSource.GetSource(protocolType, configuration);
                     var dataview = dataViewSource.LoadFromCsvFile(_mlContext, flowFilePath);
 
                     var featureColumns = customFeatureColumns ?? dataViewSource.FeatureColumns;

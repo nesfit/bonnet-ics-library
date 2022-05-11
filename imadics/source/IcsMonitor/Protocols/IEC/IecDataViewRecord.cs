@@ -12,11 +12,29 @@ namespace IcsMonitor.Protocols
     public class IecDataViewRecord
     {
 
+        /// <summary>
+        /// Flow identifier.
+        /// </summary>
         [ColumnName("FlowId")]
         public int FlowId { get; set; }
 
+        /// <summary>
+        /// Window label/identifier.
+        /// </summary>
         [ColumnName("Window")]
         public string Window { get; set; }
+
+        /// <summary>
+        /// Start of the window.
+        /// </summary>
+        [ColumnName("WindowStart")]
+        public DateTime WindowStart { get; set; }
+
+        /// <summary>
+        /// Duration of the window.
+        /// </summary>
+        [ColumnName("WindowDuration")]
+        public TimeSpan WindowDuration { get; set; }
 
         [ColumnName("FlowKey")]
         public string FlowKey => $"{SourceAddress}:{SourcePort}-{DestinationAddress}:{DestinationPort}";
@@ -153,6 +171,66 @@ namespace IcsMonitor.Protocols
         }
     }
 
+
+    /// <summary>
+    /// Represents IEC IPFIX record as produced by Wireshark IEC dissector.
+    /// </summary>
+    public class IecDataViewRecordWireshark
+    {
+        //TimeStamp,Relative Time, srcIP, dstIP, srcPort, dstPort, ipLen, len, fmt, uType, asduType, numix, cot, oa, addr, ioa
+        
+        [CsvName("ipLen")]
+        public int Bytes { get; set; }
+
+        public int Packets { get; set; } = 1;
+
+        [CsvName("TimeStamp")]
+        public DateTime StartDateTime { get; set; }
+
+        [CsvName("Relative Time")]
+        public double RelativeTime { get; set; }
+        
+        [CsvName("srcIP")]
+        public string SourceAddress { get; set; }
+
+        [CsvName("dstIP")]
+        public string DestinationAddress { get; set; }
+
+        [CsvName("srcPort")]
+        public string SourcePort { get; set; }
+
+
+        [CsvName("dstPort")]
+        public string DestinationPort { get; set; }
+
+
+        [CsvName("len")]
+        public string IecPacketLength { get; set; }
+
+
+        [CsvName("fmt")]
+        public string IecFrameFormat { get; set; }
+
+
+        [CsvName("asduType")]
+        public string AsduTypeIdentifier { get; set; }
+
+
+        [CsvName("numix")]
+        public string AsduNumberOfItems { get; set; }
+
+        [CsvName("cot")]
+        public string CauseOfTransmission { get; set; }
+
+
+        [CsvName("oa")]
+        public string AsduOrg { get; set; }
+
+
+        [CsvName("addr")]
+        public string AsduAddress { get; set; }
+
+    }
     /// <summary>
     /// Represents IEC IPFIX record as defined by Flowmon. It is loaded by CsvHelper
     /// and thus its properties needs to be annotated with Name attribute.

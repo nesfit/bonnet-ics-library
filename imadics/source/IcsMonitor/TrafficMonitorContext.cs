@@ -154,14 +154,25 @@ namespace IcsMonitor
             captureDevice.Close();
         }
 
+        public enum FeatureTransformOperation { Pca, Direct, Average }
         /// <summary>
         /// Creates the profile from the source data and provided options.
         /// </summary>
-        private TrafficProfile CreateProfile(string profileName, IndustrialProtocol protocolType, TimeSpan windowTimeSpan, MLContext mlContext, string[] featureColumns, IDataView sourceData, Dictionary<string,string> configuration)
+        private TrafficProfile CreateProfile(string profileName, IndustrialProtocol protocolType, TimeSpan windowTimeSpan, MLContext mlContext, string[] featureColumns, IDataView sourceData, FeatureTransformOperation featureTransformOperation, Dictionary<string, string> configuration)
         {
             _logger.LogInformation($"Training profile on input data.");
             var trainer = new TrafficProfileTrainer(mlContext, PcaRank, protocolType, featureColumns, windowTimeSpan);
-            var profile = trainer.Fit(Path.GetFileNameWithoutExtension(profileName), sourceData, Clusters, ModelCount, configuration);
+
+            var featureTransformer = (featureTransformOperation) switch
+            {
+                FeatureTransformOperation.Pca => trainer.PcaTransformer(3),
+                FeatureTransformOperation.Direct => trainer.DirectTransformer,
+                FeatureTransformOperation.Average => trainer.AverageTransformer,
+                _ => throw new NotImplementedException()
+            };
+
+
+            var profile = trainer.Fit(Path.GetFileNameWithoutExtension(profileName), configuration, featureTransformer, Clusters, ModelCount, sourceData);
             return profile;
         }
 
@@ -189,7 +200,7 @@ namespace IcsMonitor
         /// <param name="outputProfileFile">A name of file for saving the profile.</param>
         /// <param name="cancellationToken">The cancellation token used to stop processing the input. If the token is activated the profile is computed for the input collected so far.</param>
         /// <returns>The task that signalize the completion of the profile computation.</returns>
-        public async Task BuildProfileAsync(ICaptureDevice device, IndustrialProtocol protocolType, TimeSpan windowTimeSpan, int windowCount, string[] customFeatureColumns, string outputProfileFile, CancellationToken cancellationToken)
+        public async Task BuildProfileAsync(ICaptureDevice device, IndustrialProtocol protocolType, TimeSpan windowTimeSpan, int windowCount, FeatureTransformOperation fto, string[] customFeatureColumns, string outputProfileFile, CancellationToken cancellationToken)
         {
             try
             {
@@ -214,7 +225,7 @@ namespace IcsMonitor
                 var featureColumns = customFeatureColumns ?? dataViewSource.FeatureColumns;
 
                 _logger.LogInformation($"Computing profile.");
-                var profile = CreateProfile($"{protocolType}", protocolType, windowTimeSpan, _mlContext, featureColumns.ToArray(), dataview, null);
+                var profile = CreateProfile($"{protocolType}", protocolType, windowTimeSpan, _mlContext, featureColumns.ToArray(), dataview, fto, null);
                 _logger.LogInformation($"Saving profile to {outputProfileFile}.");
                 profile.SaveToFile(outputProfileFile);
                 _logger.LogInformation($"Done.");
@@ -233,7 +244,7 @@ namespace IcsMonitor
         /// <param name="customFeatureColumns">Custom features. Ca be null to use the default features.</param>
         /// <param name="outputProfileFile">The profile file name.</param>
         /// <returns>The task that completes after a profile is built and written to an output file.</returns>
-        public Task BuildProfileAsync(string flowFilePath, IndustrialProtocol protocolType, TimeSpan windowTimeSpan, string[] customFeatureColumns, string outputProfileFile)
+        public Task BuildProfileAsync(string flowFilePath, IndustrialProtocol protocolType, TimeSpan windowTimeSpan, FeatureTransformOperation fto, string[] customFeatureColumns, string outputProfileFile)
         {
             return Task.Run(BuildProfileAction);
 
@@ -252,7 +263,7 @@ namespace IcsMonitor
                     var featureColumns = customFeatureColumns ?? dataViewSource.FeatureColumns;
 
                     _logger.LogInformation($"Computing profile.");
-                    var profile = CreateProfile($"{protocolType}", protocolType, windowTimeSpan, _mlContext, featureColumns.ToArray(), dataview, dataViewSource.Configuration);
+                    var profile = CreateProfile($"{protocolType}", protocolType, windowTimeSpan, _mlContext, featureColumns.ToArray(), dataview, fto, dataViewSource.Configuration);
                     _logger.LogInformation($"Saving profile to {outputProfileFile}.");
                     profile.SaveToFile(outputProfileFile);
                     _logger.LogInformation($"Done.");

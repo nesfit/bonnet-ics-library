@@ -57,7 +57,13 @@ namespace IcsMonitor
                     switch (anomalyDetectionMethod)
                     {
                         case AnomalyDetectionMethod.Centroids:
-                            await _functions.BuildProfileAsync(inputOption.FlowFileValue, protocolType, windowTimeSpan, customFeatures, outputProfileFile);
+                            await _functions.BuildProfileAsync(inputOption.FlowFileValue, protocolType, windowTimeSpan, TrafficMonitorContext.FeatureTransformOperation.Direct, customFeatures, outputProfileFile);
+                            break;
+                        case AnomalyDetectionMethod.CentroidsPca:
+                            await _functions.BuildProfileAsync(inputOption.FlowFileValue, protocolType, windowTimeSpan, TrafficMonitorContext.FeatureTransformOperation.Pca, customFeatures, outputProfileFile);
+                            break;
+                        case AnomalyDetectionMethod.CentroidsAvg:
+                            await _functions.BuildProfileAsync(inputOption.FlowFileValue, protocolType, windowTimeSpan, TrafficMonitorContext.FeatureTransformOperation.Average, customFeatures, outputProfileFile);
                             break;
                     }
                 }
@@ -69,7 +75,13 @@ namespace IcsMonitor
                     switch (anomalyDetectionMethod)
                     {
                         case AnomalyDetectionMethod.Centroids:
-                            await _functions.BuildProfileAsync(captureDevice, protocolType, windowTimeSpan, windowCount, customFeatures, outputProfileFile, _appLifetime.ApplicationStopping);
+                            await _functions.BuildProfileAsync(captureDevice, protocolType, windowTimeSpan, windowCount, TrafficMonitorContext.FeatureTransformOperation.Direct, customFeatures, outputProfileFile, _appLifetime.ApplicationStopping);
+                            break;
+                        case AnomalyDetectionMethod.CentroidsPca:
+                            await _functions.BuildProfileAsync(captureDevice, protocolType, windowTimeSpan, windowCount, TrafficMonitorContext.FeatureTransformOperation.Pca, customFeatures, outputProfileFile, _appLifetime.ApplicationStopping);
+                            break;
+                        case AnomalyDetectionMethod.CentroidsAvg:
+                            await _functions.BuildProfileAsync(captureDevice, protocolType, windowTimeSpan, windowCount, TrafficMonitorContext.FeatureTransformOperation.Average, customFeatures, outputProfileFile, _appLifetime.ApplicationStopping);
                             break;
                     }
                 }

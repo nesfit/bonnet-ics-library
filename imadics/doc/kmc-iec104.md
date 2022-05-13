@@ -137,22 +137,29 @@ For the evaluation, we use the dataset that contains a single trace of normal tr
 
 ### Datasets
 
-| Dataset | Description |
-| ------- | ----------- |
-| normal-traffic | Normal IEC 104 communication (58930 packets, 2 days+19:55 hours traffic). |
-| connection-loss | Connection lost twice during communication period. |
-| dos-attack | Denial of service attack against a IEC 104 control station. |
-| injection-attack | An attacker compromises one host and starts sending unusual requests. |
-| rogue-device | A rogue devices starts communicating with an IEC 104 host using legitimate IEC 104 packets. |
-| scanning-attack | Horizontal (IP addresses) and vertical (IOA) scanning. |
-| switching-attack | Switching the device on/off. |
+| Dataset | Description | Source Files
+| ------- | ----------- | ------------ | 
+| normal-traffic | Normal IEC 104 communication (58930 packets, 2 days+19:55 hours traffic). | [normal-traffic.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/normal-traffic.csv)|
+| connection-loss | Connection lost twice during communication period. |  [connection-loss.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/connection-loss.csv)|
+| dos-attack | Denial of service attack against a IEC 104 control station. |  [dos-attack.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/dos-attack.csv)|
+| injection-attack | An attacker compromises one host and starts sending unusual requests. |  [injection-attack.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/injection-attack.csv)|
+| rogue-device | A rogue devices starts communicating with an IEC 104 host using legitimate IEC 104 packets. |  [rogue-device.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/rogue-device.csv)|
+| scanning-attack | Horizontal (IP addresses) and vertical (IOA) scanning. |  [scanning-attack.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/scanning-attack.csv)|
+| switching-attack | Switching the device on/off. |  [switching-attack.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/switching-attack.csv)|
 
 ## Normal Traffic
 
 The normal traffic consists of 1630 aggregated flows. All these flows are used to learn the profile. We tested the learned profile against the same input dataset to determine its coverage. In an ideal case, there should not be any anomalies detected. But for all tested sub-methods some false positives appeared as shown below.
 
+An aggregated flows representing the input to the method are available at:
+[normal-traffic.dump.flows.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/normal-traffic.dump.flows.csv)
+
 
 ### Centroids
+
+Scored flow records: [normal-traffic.dir.score.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/normal-traffic.dir.score.csv)
+
+Anomaly flows detected: [normal-traffic.dir.t0.1.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/normal-traffic.dir.t0.1.csv)
 
 |FlowKey                                   |WindowStart          |WindowDuration|FlowLabel|Features                 |Distances                                           |Scores |MaxScore|MinScore|AverageScore|BestModel|
 |------------------------------------------|---------------------|--------------|---------|-------------------------|----------------------------------------------------|-------|--------|--------|------------|---------|
@@ -164,6 +171,10 @@ The normal traffic consists of 1630 aggregated flows. All these flows are used t
 
 ### Centroids/Pca
 
+Scored flow records: [normal-traffic.pca.score.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/normal-traffic.pca.score.csv)
+
+Anomaly flows detected: [normal-traffic.pca.t0.1.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/normal-traffic.pca.t0.1.csv)
+
 |FlowKey                                   |WindowStart          |WindowDuration|FlowLabel|Features                 |Distances                                           |Scores |MaxScore|MinScore|AverageScore|BestModel|
 |------------------------------------------|---------------------|--------------|---------|-------------------------|----------------------------------------------------|-------|--------|--------|------------|---------|
 |"192.168.11.248:2404-192.168.11.111:61254"|"2022-05-13T17:35:00"|"00:05:00"    |"2983"   |[-1.0050718,-0.085428596,-0.3713619]|[0.23257899284362793,0.19631177186965942,0.18962126970291138]|[0,0,0]|0       |0       |0           |0        |
@@ -174,13 +185,14 @@ The normal traffic consists of 1630 aggregated flows. All these flows are used t
 
 ### Centroids/Avg
 
+Scored flow records: [normal-traffic.avg.score.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/normal-traffic.avg.score.csv)
+
+Anomaly flows detected: [normal-traffic.avg.t0.1.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/normal-traffic.avg.t0.1.csv)
+
 |FlowKey                                   |WindowStart          |WindowDuration|FlowLabel|Features                 |Distances                                           |Scores |MaxScore|MinScore|AverageScore|BestModel|
 |------------------------------------------|---------------------|--------------|---------|-------------------------|----------------------------------------------------|-------|--------|--------|------------|---------|
 |"192.168.11.248:2404-192.168.11.111:61254"|"2022-05-13T17:35:00"|"00:05:00"    |"2983"   |[0,1940,254.25,637.6515] |[405452,221592.75,156217.75]                        |[0,0,0]|0       |0       |0           |0        |
 |"192.168.11.111:61254-192.168.11.248:2404"|"2022-05-16T10:35:00"|"00:05:00"    |"58902"  |[0,36,4.5,11.905881]     |[2013.20849609375,2013.20849609375,2013.20849609375]|[0,0,0]|0       |0       |0           |0        |
-
-
-
 
 ## Connection Loss
 
@@ -188,6 +200,9 @@ There are two intervals of lost packets:
 
 * connection loss from 16:27:57.68 to 16:37:48.63 (10 minutes 146 missing packets)
 * connection loss from 08:08:01.20 to 09:08:25.95 (1 hour, 921 missing packets)
+
+An aggregated flows representing the input to the method are available at:
+[connection-loss.dump.flows.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/connection-loss.dump.flows.csv)
 
 ### Centroids
 
@@ -229,7 +244,11 @@ There are two intervals of lost packets:
 
 
 ## Dos Attack
-The attacker sends a hundred of legitimate IEC 104 packets to the destination. He uses a spoofed IP address 192.168.11.248 which sends an ASDU with TypeID 36 (Measured value, short floating point, with time tag) and CoT=3 (Spontaneous event). This message is only confirmed by the receiver using an APDU of the S-type. The attack start at 23:50:02 and ends at 01:18:29. It contains about 1049 spoofed messages. The attack is repeated at 02:30:05 and lasts until 04:01:54.  
+The attacker sends a hundred of legitimate IEC 104 packets to the destination. He uses a spoofed IP address 192.168.11.248 which sends an ASDU with TypeID 36 (Measured value, short floating point, with time tag) and CoT=3 (Spontaneous event). This message is only confirmed by the receiver using an APDU of the S-type. The attack start at 23:50:02 and ends at 01:18:29. It contains about 1049 spoofed messages. The attack is repeated at 02:30:05 and lasts until 04:01:54. 
+
+An aggregated flows representing the input to the method are available at:
+[dos-attack.dump.flows.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/dos-attack.dump.flows.csv)
+
 
 ### Centroids
 
@@ -264,7 +283,11 @@ The attacker sends a hundred of legitimate IEC 104 packets to the destination. H
 There are two attack types:
 
 * The attacker sends ASDUs with TypeID=45 (Single command) and CoT=6 (Activation) on the object with IOA=31, 32 and 2. The host responses with CoT=7 (Activation Conf). The attack starts at 19:35:19 and ends at 19:41:06. It includes 83 packets.
-* Another injection attack appears at 21:05:32 when an attacker starts to transfer a file to the compromised host with IP address 192.168.11.111. The attacker sends messages with ASDU typeID=122 (Call directory, select file), 120 (File ready), 121 (Section ready), 123 (Last section), 124 (Ack file), 125 (Segment). The attacker accesses object with IOA=65537 which is not typically accessible. The attack includes 221 messages and ends at 21:21:14. 
+* Another injection attack appears at 21:05:32 when an attacker starts to transfer a file to the compromised host with IP address 192.168.11.111. The attacker sends messages with ASDU typeID=122 (Call directory, select file), 120 (File ready), 121 (Section ready), 123 (Last section), 124 (Ack file), 125 (Segment). The attacker accesses object with IOA=65537 which is not typically accessible. The attack includes 221 messages and ends at 21:21:14.
+
+An aggregated flows representing the input to the method are available at:
+[injection-loss.dump.flows.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/injection-loss.dump.flows.csv)
+
 
 ### Centroids
 
@@ -318,6 +341,11 @@ There are two attack types:
 
 The attacker uses a sequence of IEC 104 messages with ASDU type=36 (Measured value, short floating point with time tag) and CoT=3 (spontaneous event). It also correctly responses with supervisory APDUs. The attack start at 15:19:00 and ends at 15:46:03. It uses an IP address 192.168.11.246. The attack includes 417 packets.
 
+
+An aggregated flows representing the input to the method are available at:
+[rogue-device.dump.flows.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/rogue-device.dump.flows.csv)
+
+
 ### Centroids
 
 |FlowKey                                   |WindowStart          |WindowDuration|FlowLabel|Features                 |Distances                                           |Scores |MaxScore|MinScore|AverageScore|BestModel|
@@ -362,6 +390,11 @@ Two types of scanning attacks are included:
 
 * horizontal scanning starts at 10:32:07 and ends at 10:49:10. The attacker employs a spoofed IP address 192.168.11.102:45280. The scan sends IEC 104 U-commands TestFrame Act (ApduType 0x03, UType 0x10) on port 2404 (used by IEC 104). If a station exists, the scan yields a proper response TestFrame Conf (ApduType 0x03, UType 0x20).
 * vertical scanning attack - explores IEC 104 information objects on the device with IP address 192.168.11.111. In order to masquerade his identity, the attacker uses a spoofed source address 192.168.11.248 which belongs to the existing node. The attacker sends an interrogation command with TypeID=100 (General Interrogation) and CoT=6 (Activation). If an object exists, it responses with TypeID=100 and CoT=7 (Activation Conf), otherwise it sends a message with CoT=47 (unknown object address). For vertical scanning we use a default ASDU address 65535 (Global address) and a default value for the Originator address (OA = 0, not used). The IOA length is limited to 2 bytes, however, our scan tests only values from 1 to 127. The attack starts at 01:02:18 and ends at 01:23:19.
+
+
+An aggregated flows representing the input to the method are available at:
+[scanning-attack.dump.flows.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/scanning-attack.dump.flows.csv)
+
 
 ### Centroids
 
@@ -428,6 +461,10 @@ Two types of scanning attacks are included:
 ## Switching Attack
 
 Switching the device on/off. The attack contains a sequence of IEC 104 packets with TypID=46 (double cmd), numix=1, CoT=6 (Act), Cot=7 (ActCon), CoT=10 (ActTerm), OA=0, Addr=655535, IOA=2. The attack starts at 06:27:55:00 and repeats the series (10 minutes, 72 new packets).
+
+An aggregated flows representing the input to the method are available at:
+[switching-attack.dump.flows.csv](https://github.com/nesfit/bonnet-ics-library/blob/main/imadics/data/iec/bonnet/switching-attack.dump.flows.csv)
+
 
 ### Centroids
 

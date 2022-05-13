@@ -63,7 +63,7 @@ namespace IcsMonitor.AnomalyDetection
             var transform = trainer.Fit(dataview);
             return transform;
         }
-        
+
         /// <summary>
         /// Uses PCA method to compute features from pre-features.
         /// </summary>
@@ -138,7 +138,8 @@ namespace IcsMonitor.AnomalyDetection
         {
             // We define the custom mapping between input and output rows that will
             // be applied by the transformation.
-            public static void CustomAction(InputFeatureData input, OutputFeatureData output) =>
+            public static void CustomAction(InputFeatureData input, OutputFeatureData output)
+            {
                 output.Features = new float[]
                 {
                     input.PreFeatures.Min(),
@@ -146,7 +147,7 @@ namespace IcsMonitor.AnomalyDetection
                     input.PreFeatures.Average(),
                     StandardDeviation(input.PreFeatures)
                 };
-
+            }
             public override Action<InputFeatureData, OutputFeatureData> GetMapping()
                 => CustomAction;
         }

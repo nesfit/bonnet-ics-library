@@ -15,8 +15,8 @@ namespace IcsMonitor.Protocols
         /// <summary>
         /// Flow identifier.
         /// </summary>
-        [ColumnName("FlowId")]
-        public int FlowId { get; set; }
+        [ColumnName("FlowLabel")]
+        public string FlowLabel { get; set; }
 
         /// <summary>
         /// Window label/identifier.
@@ -113,7 +113,7 @@ namespace IcsMonitor.Protocols
         {
             return new IecDataViewRecord
             {
-                FlowId = Math.Min(arg1.FlowId, arg2.FlowId),
+                FlowLabel = Math.Min(Int32.Parse(arg1.FlowLabel), Int32.Parse(arg2.FlowLabel)).ToString(),
                 Flows = arg1.Flows + arg2.Flows,
                 StartDateTime = new DateTime(Math.Min(arg1.StartDateTime.Ticks, arg2.StartDateTime.Ticks)),
                 SourceAddress = arg1.SourceAddress,

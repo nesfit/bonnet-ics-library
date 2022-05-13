@@ -198,7 +198,7 @@ namespace IcsMonitor.Protocols
             output.CauseOfTransmission = input.CauseOfTransmission;
             output.DestinationAddress = input.DestinationAddress;
             output.DestinationPort = Int32.TryParse(input.DestinationPort, out var destinationPort) ? destinationPort : 0;
-            output.FlowId = input.ExportCounter;
+            output.FlowLabel = input.ExportCounter.ToString();
             output.IecFrameFormat = input.IecFrameFormat;
             output.IecPacketLength = Int32.TryParse(input.IecPacketLength, out var iecPacketLength)? iecPacketLength : 0;
             output.Packets = input.Packets;
@@ -222,7 +222,7 @@ namespace IcsMonitor.Protocols
             output.CauseOfTransmission = input.CauseOfTransmission;
             output.DestinationAddress = input.DestinationAddress;
             output.DestinationPort = Int32.TryParse(input.DestinationPort, out var destinationPort) ? destinationPort : 0;
-            output.FlowId = recordIndex;
+            output.FlowLabel = recordIndex.ToString();
             output.IecFrameFormat = input.IecFrameFormat;
             output.IecPacketLength = Int32.TryParse(input.IecPacketLength, out var iecPacketLength) ? iecPacketLength : 0;
             output.Packets = input.Packets;

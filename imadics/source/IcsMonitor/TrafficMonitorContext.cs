@@ -101,7 +101,7 @@ namespace IcsMonitor
         /// <param name="profile">The profile.</param>
         /// <param name="outputFormat">Required output format./param>
         /// <param name="textWriter">The output writer.</param>
-        public Task TestFlowsAsync(string flowsFile, TrafficProfile profile, OutputFormat outputFormat, TextWriter textWriter)
+        public Task TestFlowsAsync(string flowsFile, TrafficProfile profile, OutputFormat outputFormat, TextWriter textWriter, double thresholdValue, TextWriter detectedWriter)
         {
             return Task.Run(TestFlowsAction);
             void TestFlowsAction()
@@ -109,11 +109,21 @@ namespace IcsMonitor
                 var dataViewSource = FlowsDataViewSource.GetSource(profile.ProtocolType, profile.Configuration);
                 var dataview = dataViewSource.LoadFromCsvFile(_mlContext, flowsFile);
                 var scoring = profile.Transform(dataview);
+
                 var outputFileWriter = DataViewWriterFactory.CreateWriter(outputFormat, textWriter, scoring.Schema);
                 outputFileWriter.BeginDocument();
                 var flowCount = outputFileWriter.AppendDataView(scoring);
                 outputFileWriter.EndDocument();
-                _logger.LogInformation($"Test flow completed: {flowCount} flows tested.");
+
+                var filteredData = _mlContext.Data.FilterRowsByColumn(scoring, columnName: "AverageScore", lowerBound: 0, upperBound: thresholdValue);
+
+                var detectedFileWriter = DataViewWriterFactory.CreateWriter(outputFormat, detectedWriter, scoring.Schema);
+                detectedFileWriter.BeginDocument();
+                var flowCountDetected = detectedFileWriter.AppendDataView(filteredData);
+                detectedFileWriter.EndDocument();
+
+
+                _logger.LogInformation($"Test flow completed: {flowCount} flows tested, {flowCountDetected} anomaly flows detected (threshold={thresholdValue}).");
             }
         }
 

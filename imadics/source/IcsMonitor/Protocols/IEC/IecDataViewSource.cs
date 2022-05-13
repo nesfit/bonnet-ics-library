@@ -25,7 +25,7 @@ namespace IcsMonitor.Protocols
         { 
         }
 
-        public override string[] FeatureColumns => new[] { "IEC104_PKT_LENGTH_VECTOR", "IEC104_ASDU_NUM_ITEMS_VECTOR" };
+        public override string[] FeatureColumns => new[] { "IEC104_PKT_LENGTH_VECTOR" }; //, "IEC104_ASDU_NUM_ITEMS_VECTOR" };
 
         public override Task<IDataView> GetDataViewAsync<TKey>(MLContext ml, IObservable<FlowRecord<TKey, IecCompact>> observable)
         {

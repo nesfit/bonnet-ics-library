@@ -204,10 +204,20 @@ namespace IcsMonitor.Protocols
             output.Packets = input.Packets;
             output.SourceAddress = input.SourceAddress;
             output.SourcePort = Int32.TryParse(input.SourcePort, out var sourcePort) ? sourcePort : 0;
-            output.OperationTag = $"Tag_{input.IecFrameFormat}_{input.CauseOfTransmission}";
+            output.OperationTag = GetTagString(input);
             output.StartDateTime = input.StartDateTime;
             return output;
         }
+
+        private string GetTagString(IecDataViewRecordFlowmon input)
+        {
+            return $"{input.IecFrameFormat}.{input.CauseOfTransmission}";
+        }
+        private string GetTagString(IecDataViewRecordWireshark input)
+        {
+            return $"{input.IecFrameFormat}.{input.CauseOfTransmission}";
+        }
+
         DateTime? OriginDateTime = null;
         private IecDataViewRecord WiresharkToNativeRowMapping(IecDataViewRecordWireshark input, int recordIndex)
         {
@@ -228,10 +238,12 @@ namespace IcsMonitor.Protocols
             output.Packets = input.Packets;
             output.SourceAddress = input.SourceAddress;
             output.SourcePort = Int32.TryParse(input.SourcePort, out var sourcePort) ? sourcePort : 0;
-            output.OperationTag = $"Tag_{input.IecFrameFormat}_{input.CauseOfTransmission}";
+            output.OperationTag = GetTagString(input);
             output.StartDateTime = (OriginDateTime ?? DateTime.Today) + TimeSpan.FromSeconds(input.RelativeTime);
             return output;
         }
+
+
 
         public override IObservable<PacketRecord<Packet>> LoadFromDevice(ICaptureDevice captureDevice, CancellationToken cancellationToken)
         {

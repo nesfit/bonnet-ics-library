@@ -124,6 +124,7 @@ namespace IcsMonitor.Protocols
                 Packets = arg1.Packets + arg2.Packets,
                 IecPacketLength = arg1.IecPacketLength + arg2.IecPacketLength,
                 AsduNumberOfItems = arg1.AsduNumberOfItems + arg2.AsduNumberOfItems,
+                OperationTagVector = arg1.OperationTagVector,
                 IecPacketLengthVector = SumArray(arg1.IecPacketLengthVector, arg2.IecPacketLengthVector),
                 AsduNumberOfItemsVector = SumArray(arg1.AsduNumberOfItemsVector, arg2.AsduNumberOfItemsVector),
 
@@ -143,15 +144,15 @@ namespace IcsMonitor.Protocols
         {
             public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
             {
-                if (text == "") return new float[0];
-                string[] allElements = text.Split(',');
+                if (text == "") return Array.Empty<float>();
+                string[] allElements = text.TrimStart('[').TrimEnd(']').Split(',');
                 return allElements.Select(s => float.Parse(s)).ToArray();
             }
 
             public override string ConvertToString(object value, IWriterRow row, MemberMapData memberMapData)
             {
                 if (value == null) return String.Empty;
-                return string.Join(",", (float[])value);
+                return "[" + string.Join(",", (float[])value) + "]";
             }
         }
 

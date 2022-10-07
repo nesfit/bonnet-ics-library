@@ -46,7 +46,7 @@
     },
     "iec-test-flows": {
       "commandName": "Project",
-      "commandLineArgs": "test-flows -R \"flowmon\\01-iec104-normal.csv\" -p \"profiles\\iec_normal_traffic.profile.zip\" -f csv > \"flowmon\\01-iec104-normal.score.csv\"",
+      "commandLineArgs": "test-flows -R \"flowmon\\01-iec104-normal.csv\" -p \"profiles\\iec_normal_traffic.profile.zip\" -f csv -w \"flowmon\\01-iec104-normal.score.csv\"",
       "workingDirectory": "$(SolutionDir)data\\iec"
     },
     "iec-build-profile-wireshark": {

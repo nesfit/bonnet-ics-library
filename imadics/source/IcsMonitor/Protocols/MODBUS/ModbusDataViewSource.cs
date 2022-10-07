@@ -1,16 +1,23 @@
 ﻿using AutoMapper;
+using CsvHelper;
+using CsvHelper.Configuration;
 using IcsMonitor.Flows;
 using Microsoft.ML;
 using PacketDotNet;
 using SharpPcap;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using Traffix.Core.Flows;
 using Traffix.Core.Observable;
+using YamlDotNet.Core.Tokens;
 
 namespace IcsMonitor.Modbus
 {
@@ -56,6 +63,7 @@ namespace IcsMonitor.Modbus
             {
                 cfg.CreateMap<FlowRecord<TKey,ModbusCompact>, ModbusDataViewRecord>();
                 cfg.CreateMap<TimeSpan, double>().ConvertUsing(ts => ts.TotalSeconds);
+                cfg.CreateMap<TimeSpan, float>().ConvertUsing(ts => (float)ts.TotalSeconds);
             }).CreateMapper();
 
             var records = enumerable.Select(x => mapper.Map<FlowRecord<TKey, ModbusCompact>, ModbusDataViewRecord>(x)).ToList();
@@ -69,7 +77,31 @@ namespace IcsMonitor.Modbus
 
         public override IDataView LoadFromCsvFile(MLContext mlContext, string file)
         {
-            return mlContext.Data.LoadFromTextFile<ModbusDataViewRecord>(file, separatorChar: ',', hasHeader: true, allowQuoting: true);
+            //var dv =  mlContext.Data.LoadFromTextFile<ModbusDataViewRecord>(file, separatorChar: ',', hasHeader: true, allowQuoting: true, trimWhitespace: true);
+            using var reader = new StreamReader(file);
+            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture) { });
+            var records = csv.GetRecords<dynamic>().ToArray();
+
+            var mapper = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<string, string>().ConvertUsing(s => ConvertFromJson<string>(s));
+                cfg.CreateMap<string, int>().ConvertUsing(s => ConvertFromJson<int>(s));
+                cfg.CreateMap<string, long>().ConvertUsing(s => ConvertFromJson<long>(s));
+                cfg.CreateMap<string, float>().ConvertUsing(s => ConvertFromJson<float>(s));
+                cfg.CreateMap<string, float[]>().ConvertUsing(s => ConvertFromJson<float[]>(s));
+                cfg.CreateMap<string, DateTime>().ConvertUsing(s => ConvertFromJson<DateTime>(s));
+                cfg.CreateMap<string, TimeSpan>().ConvertUsing(s => ConvertFromJson<TimeSpan>(s));
+                cfg.CreateMap<string, double>().ConvertUsing(s=> ConvertFromJson<double>(s));
+            }).CreateMapper();
+            var x = records.Select<dynamic, ModbusDataViewRecord>(r => mapper.Map<dynamic, ModbusDataViewRecord>(r));
+            var dv = mlContext.Data.LoadFromEnumerable<ModbusDataViewRecord>(x);
+            var prev = dv.Preview();
+            return dv;
+        }
+        T ConvertFromJson<T>(String s)
+        {
+            var value = JsonSerializer.Deserialize<T>(s);
+            return value;
         }
     }
 }

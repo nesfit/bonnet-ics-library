@@ -16,80 +16,79 @@ namespace IcsMonitor.Modbus
         /// </summary>
         [LoadColumn(0)]
         [ColumnName("WindowLabel")]
-        public string WindowLabel;
-        /// <summary>
+        public string WindowLabel { get; set; }
         /// Start of the window.
         /// </summary>
         [LoadColumn(1)]
         [ColumnName("WindowStart")]
-        public DateTime WindowStart;
+        public DateTime WindowStart { get; set; }
 
         /// <summary>
         /// Duration of the window.
         /// </summary>
         [LoadColumn(2)]
         [ColumnName("WindowDuration")]
-        public TimeSpan WindowDuration;
+        public TimeSpan WindowDuration { get; set; }
 
         /// <summary>
         /// The label of the flow. Can be used for classification. 
         /// </summary>
         [LoadColumn(3)]
         [ColumnName("FlowLabel")]
-        public string FlowLabel;
+        public string FlowLabel { get; set; }
         /// <summary>
         /// The flow key. This field is required by the profile.
         /// </summary>
         [LoadColumn(4)]
         [ColumnName("FlowKey")]
-        public string FlowKey;
+        public string FlowKey { get; set; }
 
         // ForwardMetrics
         [LoadColumn(5)]
         [ColumnName("ForwardMetricsDuration")]
-        public double ForwardMetricsDuration;
+        public float ForwardMetricsDuration { get; set; }
 
         [LoadColumn(6)]
-        public long ForwardMetricsOctets;
+        public float ForwardMetricsOctets { get; set; }
         [LoadColumn(7)]
-        public int ForwardMetricsPackets;
+        public float ForwardMetricsPackets { get; set; }
         [LoadColumn(8)]
-        public long ForwardMetricsFirstSeen;
+        public long ForwardMetricsFirstSeen { get; set; }
         [LoadColumn(9)]
-        public long ForwardMetricsLastSeen;
+        public long ForwardMetricsLastSeen { get; set; }
 
         // ReverseMetrics
         [LoadColumn(10)]
-        public double ReverseMetricsDuration;
+        public float ReverseMetricsDuration { get; set; }
         [LoadColumn(11)]
-        public long ReverseMetricsOctets;
+        public float ReverseMetricsOctets { get; set; }
         [LoadColumn(12)]
-        public int ReverseMetricsPackets;
+        public float ReverseMetricsPackets { get; set; }
         [LoadColumn(13)]
-        public long ReverseMetricsFirstSeen;
+        public long ReverseMetricsFirstSeen { get; set; }
         [LoadColumn(14)]
-        public long ReverseMetricsLastSeen;
+        public long ReverseMetricsLastSeen { get; set; }
 
         // Modbus
         [LoadColumn(15)]
-        public byte DataUnitId;
+        public float DataUnitId { get; set; }
         [LoadColumn(16)]
-        public int DataReadRequests;
+        public float DataReadRequests { get; set; }
         [LoadColumn(17)]
-        public int DataWriteRequests;
+        public float DataWriteRequests { get; set; }
         [LoadColumn(18)]
-        public int DataDiagnosticRequests;
+        public float DataDiagnosticRequests { get; set; }
         [LoadColumn(19)]
-        public int DataOtherRequests;
+        public float DataOtherRequests { get; set; }
         [LoadColumn(20)]
-        public int DataUndefinedRequests;
+        public float DataUndefinedRequests { get; set; }
         [LoadColumn(21)]
-        public int DataResponsesSuccess;
+        public float DataResponsesSuccess { get; set; }
         [LoadColumn(22)]
-        public int DataResponsesError;
+        public float DataResponsesError { get; set; }
         [LoadColumn(23)]
-        public int DataMalformedRequests;
+        public float DataMalformedRequests { get; set; }
         [LoadColumn(24)]
-        public int DataMalformedResponses;
+        public float DataMalformedResponses { get; set; }
     }
 }

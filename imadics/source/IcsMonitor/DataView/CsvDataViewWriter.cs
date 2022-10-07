@@ -16,7 +16,7 @@ namespace Traffix.DataView
         public CsvDataViewWriter(TextWriter writer, DataViewSchema schema) : base(writer, schema)
         {
             _csv = new CsvWriter(writer, new CsvConfiguration(CultureInfo.InvariantCulture)
-            { SanitizeForInjection = true });
+            { SanitizeForInjection = false });
         }
         protected override void Dispose(bool disposing)
         {

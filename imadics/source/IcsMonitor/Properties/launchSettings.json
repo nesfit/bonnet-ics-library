@@ -36,7 +36,7 @@
     },
     "test-flows": {
       "commandName": "Project",
-      "commandLineArgs": "test-flows -R \"lemay\\attack\\characterization_modbus_6RTU_with_operate.flows.csv\" -p \"profiles\\6RTU_with_operate.profile.zip\" -f csv > \"results\\6RTU_with_operate.csv\"",
+      "commandLineArgs": "test-flows -R \"lemay\\attack\\characterization_modbus_6RTU_with_operate.flows.csv\" -p \"profiles\\6RTU_with_operate.profile.zip\" -f csv -w \"results\\6RTU_with_operate.csv\"",
       "workingDirectory": "$(SolutionDir)data\\modbus"
     },
     "iec-build-profile-flows": {

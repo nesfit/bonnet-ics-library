@@ -21,11 +21,11 @@ namespace IcsMonitor
                 {
                     logging.AddConsole(options =>
                     {
-                        options.LogToStandardErrorThreshold = LogLevel.Information;
+                        options.LogToStandardErrorThreshold = LogLevel.Error;
                         options.IncludeScopes = true;
                         options.TimestampFormat = "hh:mm:ss ";
                     });
-                    logging.SetMinimumLevel(LogLevel.Information);
+                    logging.SetMinimumLevel(LogLevel.Warning);
                 })
                 .RunConsoleAsync();
         }

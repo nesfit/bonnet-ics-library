@@ -12,8 +12,7 @@ namespace IcsMonitor
         private void BuidProfileCommand(CommandLineApplication command)
         {
             command.Description = "Create a profile for the given input and profile parameters.";
-            command.ExtendedHelpText = "This command monitors the communication on the given network interface, collects flows of the target profile protocol and " +
-            "applies the profile.";
+            command.ExtendedHelpText = "This command monitors the communication on the given input and compute the system profile.";
             command.HelpOption("-?|-h|--help");
 
             var inputOption = command.AddInputOptions();

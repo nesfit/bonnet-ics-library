@@ -109,8 +109,8 @@ namespace IcsMonitor.AnomalyDetection
             var trainer = new ModelTrainer(_ml);
             var models = clusterCountVector.Select(n => GetModel(trainer, trainData, n)).Where(x => x != null);
             var modelMetrics = models.Select(m => m.Evaluate(_ml, trainData));
-            var bestModels = models.OrderBy(m => m.Evaluate(_ml, trainData).DaviesBouldinIndex).Take(maxModelCount);
-            return new TrafficProfile(_ml, bestModels.ToArray(), dataview.Schema, transform, new TrafficProfile.Settings { ProtocolType = _protocolType, WindowTimeSpan = _windowTimeSpan, ProfileName = profileName, Configuration = configuration });
+            var bestModels = models.OrderBy(m => m.Evaluate(_ml, trainData).DaviesBouldinIndex).Take(maxModelCount).ToArray();
+            return new TrafficProfile(_ml, bestModels, dataview.Schema, transform, new TrafficProfile.Settings { ProtocolType = _protocolType, WindowTimeSpan = _windowTimeSpan, ProfileName = profileName, Configuration = configuration });
         }
         /// <summary>
         /// Computes the <see cref="ClusterModel"/> using the given trainer and source data. 
@@ -128,6 +128,7 @@ namespace IcsMonitor.AnomalyDetection
             catch (InvalidOperationException ex)
             {
                 Console.Error.WriteLine($"ERROR: Cannot create model: {ex.Message}");
+                Console.Error.WriteLine($"       {ex.InnerException?.Message}");
                 return null;
             }
         }

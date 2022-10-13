@@ -1,13 +1,12 @@
 ﻿# IcsMonitor
 
-The project implements a proof of concept of anomaly detection based on a pre-computed profile applicable to ICS protocols. 
-The tool works on packet capture files consisting of ICS communication. It works in two basic modes. i) In a mode of profile building expecting to provide a capture file representing a normal system communication that can be used to learn it and create the profile. ii) In traffic anomaly detection mode, the previously created profile is applied to the provided packet capture files for detecting deviations to the normal communication. 
-The tool is implemented in C# and uses the ML.NET library for performing data analysis tasks.
+The tool implements a proof of concept of anomaly detection based on a pre-computed profile applicable to ICS protocols. 
+It works on packet capture files consisting of ICS communication. It has two basic modes: i) In a mode of profile building it takes the provided capture file representing a normal system communication and creates the profile; ii) In traffic anomaly detection mode, the previously created profile is applied to the provided packet capture files or live traffic for detecting deviations to the normal communication. The tool is implemented in C# and uses the ML.NET library for performing data analysis tasks.
 
 
 ## 🚀 Getting Started
 
-The project is entirely written in C# 10 requiring .NET 6. It depends on packages that can be installed via nuget package manager system. Packet capture processing is done via [SharpPcap](https://github.com/dotpcap/sharppcap) package that requires a native `*pcap` library to be installed (depends on the OS).
+The project is entirely written in C# 10 requiring .NET 6. It depends on packages that can be installed via the NuGet package manager system. Packet capture processing is done via [SharpPcap](https://github.com/dotpcap/sharppcap) package that requires a native `*pcap` library to be installed (depending on the OS).
 The application is multiplatform and runs on every OS that supports .NET 6.
 
 ### Prerequisites
@@ -30,7 +29,7 @@ gh repo clone rysavy-ondrej/bonnet-ics
 wget https://github.com/rysavy-ondrej/bonnet-ics/archive/refs/heads/main.zip
 ```
 
-* In root folder of the project execute the following command that restores references and build the executable file:
+* In the root folder of the project execute the following command that restores references and builds the executable file:
 
 ```
 dotnet build
@@ -40,7 +39,7 @@ dotnet build
 
 ## Usage
 
-The tool provides two main functions, namely, building a profile from normal traffic and examining the provided communication for violating the expected traffic patterns. The tool provides the following commands:
+The tool provides two main functions: building a profile from normal traffic and examining the provided communication for violating the expected traffic patterns. The tool provides the following commands:
 
 | Command       | Description |
 | ------------- | -------------------- |
@@ -53,7 +52,7 @@ The tool provides two main functions, namely, building a profile from normal tra
 
 ### Build-Profile Command
 
-Given a normal traffic packet capture file, it is possible to create a profile from it. When creating the profile some other parameters need to be set, in particular, the industrial protocol of the communication, the window size for collecting packets, and computing statistics for them.  
+A normal traffic packet capture file makes it possible to create a profile. When creating the profile some other parameters need to be set, in particular, the industrial protocol of the communication, the window size for collecting packets, and computing statistics for them.  
 
 ```
 Usage: IcsMonitor Build-Profile [options]
@@ -72,13 +71,13 @@ Options:
   -w|--output-file <value>    An output file name to store the profile. This option is required.
 ```
 
-The following command builds profile based on the specified flow file:
+The following command builds a profile based on the specified flow file:
 
 ```
 IcsMonitor Build-Profile -R "lemay\attack\characterization_modbus_6RTU_with_operate.flows.csv" -t "00:01:00" -c 60 -m Centroids -p Modbus -f "ForwardMetricsPackets,ForwardMetricsOctets,ReverseMetricsPackets,ReverseMetricsOctets" -w "profiles\6RTU_with_operate.profile.zip"
 ```
 
-The next command builds based on the specifif capture file:
+The next command builds based on the specific capture file:
 
 ```
 IcsMonitor Build-Profile -r "lemay\attack\characterization_modbus_6RTU_with_operate.pcap" -t "00:01:00" -c 30 -m Centroids -p Modbus -f "ForwardMetricsPackets,ForwardMetricsOctets,ReverseMetricsPackets,ReverseMetricsOctets" -w "profiles\6RTU_with_operate.profile.zip"
@@ -90,7 +89,7 @@ Finally, it is also possible to build profile from live capture:
 IcsMonitor  Build-Profile -i 0 -m centroids -p modbus -t 00:00:10 -c 30 -w .\data\modbus\profiles\factory-assembler-10s.profile.zip
 ```
 
-Built profile is stored in the profile file and can be used to detect anomalies. It is possible to print the configuration of profile file by the following command:
+The built profile is stored in the profile file and can be used to detect anomalies. It is possible to print the configuration of the profile file by the following command:
 
 ```
 IcsMonitor show-profile  -p "profiles\6RTU_with_operate.profile.zip"
@@ -98,7 +97,7 @@ IcsMonitor show-profile  -p "profiles\6RTU_with_operate.profile.zip"
 
 ### Test-Flows Command
 
-The created profile is used to test the network communication and find possible violations from the expected traffic patterns as recognized and encoded in the profile. 
+The created profile tests the network communication and finds possible violations from the expected traffic patterns as recognized and encoded in the profile. 
 
 ```
 Usage: IcsMonitor Test-Flows [options]
@@ -117,8 +116,8 @@ IcsMonitor Test-Flows -R "lemay\attack\characterization_modbus_6RTU_with_operate
 ```
 
 ### Watch-Traffic Command
-The command performs anomaly detection applied to the packet communication. It performs flow identification and sampling data in windows 
-as defined in the profile file. The results of anomaly detection is printed on the standard output in the configurable format.
+
+The command performs anomaly detection applied to the packet communication. It performs flow identification and sampling data in windows defined in the profile file. Anomaly detection results are printed on the standard output in the configurable format.
 
 ```
 Usage: IcsMonitor Watch-Traffic [options]
@@ -133,7 +132,7 @@ Options:
   -f|--output-format <value>  A format of the output. Can be one of Json, Csv, Yaml, Markdown. Default is Json.
 ```
 
-The command enables to test flows in the capture traffic provided as packet capture file:
+The command tests the flows in the captured traffic provided as a packet capture file:
 
 ```
 IcsMonitor Watch-Traffic -r "lemay\attack\characterization_modbus_6RTU_with_operate.pcap" -p "profiles\6RTU_with_operate.profile.zip" -f csv > "results\6RTU_with_operate.csv"
@@ -147,7 +146,7 @@ IcsMonitor Watch-Traffic -i 0  -p profiles\factory-assembler-1m.profile.zip -f y
 
 ### Export-Flows Command
 
-The command enables to convert capture files or a live capture to the flow file. If the resulting file is a CSV file it can be used as an input to other commands of this tool and also consumed by some other systems. 
+The command enables the conversion of capture files or a live capture to the flow file. If the resulting file is a CSV file, it can be used as input to other commands of this tool and consumed by some other systems. 
 
 ```
 Usage: IcsMonitor Export-Flows [options]
@@ -169,20 +168,6 @@ To convert a single capture file to the flow CSV file use the command as follows
 ```
 Export-Flows -r "lemay\attack\characterization_modbus_6RTU_with_operate.pcap" -p modbus -t "00:01:00" -f csv -w "lemay\attack\characterization_modbus_6RTU_with_operate.flows.csv"
 ```
-
-## Roadmap
-
-- [X] Algorithm for profile building
-- [X] Algorithm for anomaly detection
-- [ ] Add support for profile extension with new normal traffic
-- [ ] Add support for profile cleaning
-- [ ] Add additional examples
-- [ ] Complete documentation of the algorithm
-- [ ] Multi-protocol Support
-    - [ ] MQTT
-    - [ ] CoAP
-    - [ ] DNP3
-    - [ ] S7
 
 ## License
 

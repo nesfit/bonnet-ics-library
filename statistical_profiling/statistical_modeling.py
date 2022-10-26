@@ -1,10 +1,32 @@
-# Created in December 2021 by Ivana Burgetova
-# Project: BONNET - statistical profiling
+#!/usr/bin/env python3
 
-"""
-This script found the statistical profiles of the communications and their directions in the input file.
+"""!
+This script found the statistical profiles of the communications and their directions from the input file.
+
+\author
+    Ivana Burgetová
+
+\copyright
+Copyright (C) 2021  Ivana Burgetová, <burgetova@fit.vutbr.cz>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License.
+If not, see <http://www.gnu.org/licenses/>.
+
+
 Input parameters:
--f input_file
+-f input_file (csv format, each line represents one packet)
+   First four columns (separated with semicolon) should contain following values:
+   TimeStamp; RelativeTime; srcIP; dstIP
 -t size of time window in seconds (default value = 300)
 
 Output: statistical profiles for individual communications and their directions
@@ -18,13 +40,17 @@ Output: statistical profiles for individual communications and their directions
 from argparse import ArgumentParser
 import statistical_modeling_functions as smf
 
+# Global variables:
+## dictionary of the lists that capture one-directinal communication
 traffic_dict = {}
+## dictionary of the lists that capture one-directinal communication with added inter-arrival times
 split_traffic_dict = {}
+## dictionary of candidate split-points (one item per each one-directional communication)
 candidate_split_points_dict = {}
+## dictionary of final statistical descriptions (one item per each one-directional communication)
 profiles_dict = {}
-max_time = 0
+## maximal standard deviation revealed during the best split point search
 max_std = 0
-best_boundary = 0
 
 # definition of the arguments
 parser = ArgumentParser(description='The argument -f is required to specify the input file.')

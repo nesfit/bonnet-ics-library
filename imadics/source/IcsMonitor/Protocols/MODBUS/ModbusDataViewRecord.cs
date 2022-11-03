@@ -43,51 +43,124 @@ namespace IcsMonitor.Modbus
         [ColumnName("FlowKey")]
         public string FlowKey { get; set; }
 
-        // ForwardMetrics
+        /// <summary>
+        /// Duration of forward flow.
+        /// </summary>
         [LoadColumn(5)]
         [ColumnName("ForwardMetricsDuration")]
         public float ForwardMetricsDuration { get; set; }
 
+        /// <summary>
+        /// Number of octets in the forward flow.
+        /// </summary>
         [LoadColumn(6)]
         public float ForwardMetricsOctets { get; set; }
+
+        /// <summary>
+        /// Number of packets in the forward flow.
+        /// </summary>
         [LoadColumn(7)]
         public float ForwardMetricsPackets { get; set; }
+
+        /// <summary>
+        /// Start time of the forward flow.
+        /// </summary>
         [LoadColumn(8)]
         public long ForwardMetricsFirstSeen { get; set; }
+
+        /// <summary>
+        /// End time of the forward flow.
+        /// </summary>
         [LoadColumn(9)]
         public long ForwardMetricsLastSeen { get; set; }
 
-        // ReverseMetrics
+        /// <summary>
+        /// Duration of the reverse flow.
+        /// </summary>
         [LoadColumn(10)]
         public float ReverseMetricsDuration { get; set; }
+
+        /// <summary>
+        /// Number of octets in the reverse flow.
+        /// </summary>
         [LoadColumn(11)]
         public float ReverseMetricsOctets { get; set; }
+
+        /// <summary>
+        /// Number of packets in the reverse flow.
+        /// </summary>
         [LoadColumn(12)]
         public float ReverseMetricsPackets { get; set; }
+
+        /// <summary>
+        /// Start time of the reverse flow.
+        /// </summary>
         [LoadColumn(13)]
         public long ReverseMetricsFirstSeen { get; set; }
+
+        /// <summary>
+        /// End time of the reverse flow.
+        /// </summary>
         [LoadColumn(14)]
         public long ReverseMetricsLastSeen { get; set; }
 
-        // Modbus
+        /// <summary>
+        /// The data unit IT value.
+        /// </summary>
         [LoadColumn(15)]
         public float DataUnitId { get; set; }
+
+        /// <summary>
+        /// Number of read requests.
+        /// </summary>
         [LoadColumn(16)]
         public float DataReadRequests { get; set; }
+
+        /// <summary>
+        /// Number of write requests.
+        /// </summary>
         [LoadColumn(17)]
         public float DataWriteRequests { get; set; }
+
+        /// <summary>
+        /// Number of diagnostic requests.
+        /// </summary>
         [LoadColumn(18)]
         public float DataDiagnosticRequests { get; set; }
+
+        /// <summary>
+        /// Number of other requests.
+        /// </summary>
         [LoadColumn(19)]
         public float DataOtherRequests { get; set; }
+
+        /// <summary>
+        /// Number of undefined requests.
+        /// </summary>
         [LoadColumn(20)]
         public float DataUndefinedRequests { get; set; }
+
+        /// <summary>
+        /// Number of correct responses.
+        /// </summary>
         [LoadColumn(21)]
         public float DataResponsesSuccess { get; set; }
+        /// <summary>
+        /// Number of response with error code.
+        /// </summary>
         [LoadColumn(22)]
         public float DataResponsesError { get; set; }
+
+        /// <summary>
+        /// Number of malformed requests.
+        /// </summary>
         [LoadColumn(23)]
         public float DataMalformedRequests { get; set; }
+
+
+        /// <summary>
+        /// Number of malformed responses.
+        /// </summary>
         [LoadColumn(24)]
         public float DataMalformedResponses { get; set; }
     }

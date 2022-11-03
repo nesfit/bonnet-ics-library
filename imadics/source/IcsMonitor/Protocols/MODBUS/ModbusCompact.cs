@@ -29,8 +29,14 @@ namespace IcsMonitor.Modbus
             return new ModbusCompact(ref aggregated);
         }
 
+        /// <summary>
+        /// Gets unit ID.
+        /// </summary>
         [Key("MODBUS_UNIT_ID")]
         public byte UnitId => _data.UnitId;
+        /// <summary>
+        /// Gets the number of all read requests.
+        /// </summary>
 
         [Key("MODBUS_READ_REQUESTS")]
         public int ReadRequests =>
@@ -40,6 +46,10 @@ namespace IcsMonitor.Modbus
             + _data.ReadFileRecordRequests
             + _data.ReadHoldingRegistersRequests
             + _data.ReadInputRegistersRequests;
+
+        /// <summary>
+        /// Gets the number of all write requests.
+        /// </summary>
 
         [Key("MODBUS_WRITE_REQUESTS")]
         public int WriteRequests =>
@@ -51,14 +61,30 @@ namespace IcsMonitor.Modbus
             + _data.MaskWriteRegisterRequests
             + _data.ReadWriteMultRegistersRequests;
 
+
+        /// <summary>
+        /// Gets the number of all diagnostic requests.
+        /// </summary>
         [Key("MODBUS_DIAGNOSTIC_REQUESTS")]
         public int DiagnosticRequests => _data.DiagnosticFunctionsRequests;
+
+        /// <summary>
+        /// Gets the number of other rquests.
+        /// </summary>
 
         [Key("MODBUS_OTHER_REQUESTS")]
         public int OtherRequests => _data.OtherFunctionsRequests;
 
+        /// <summary>
+        /// Gets the number of undefined requests.
+        /// </summary>
+
         [Key("MODBUS_UNDEFINED_REQUESTS")]
         public int UndefinedRequests => _data.UndefinedFunctionsRequests;
+
+        /// <summary>
+        /// Gets the number of successful responses.
+        /// </summary>
 
         [Key("MODBUS_RESPONSES_SUCCESS")]
         public int ResponsesSuccess =>
@@ -79,6 +105,10 @@ namespace IcsMonitor.Modbus
             + _data.WriteSingleCoilResponsesSuccess
             + _data.WriteSingleRegisterResponsesSuccess;
 
+        /// <summary>
+        /// Gets the number of errorneous responses.
+        /// </summary>
+
         [Key("MODBUS_RESPONSES_ERROR")]
         public int ResponsesError =>
               _data.DiagnosticFunctionsResponsesError
@@ -98,8 +128,16 @@ namespace IcsMonitor.Modbus
             + _data.WriteSingleCoilResponsesError
             + _data.WriteSingleRegisterResponsesError;
 
+
+        /// <summary>
+        /// Gets the number of malforemd requests.
+        /// </summary>
         [Key("MODBUS_MALFORMED_REQUESTS")]
         public int MalformedRequests => _data.MalformedRequests;
+
+        /// <summary>
+        /// Get the number of malformed responses.
+        /// </summary>
 
         [Key("MODBUS_MALFORMED_RESPONSES")]
         public int MalformedResponses => _data.MalformedResponses;

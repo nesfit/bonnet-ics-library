@@ -7,6 +7,10 @@ namespace IcsMonitor
 {
     internal sealed partial class ConsoleService
     {
+        /// <summary>
+        /// Implements and registers Watch-Traffic command.
+        /// </summary>
+        /// <param name="command">The command object used to register the command.</param>
         private void WatchTrafficCommand(CommandLineApplication command)
         {
             command.Description = "Watch traffic and test flows using the existing profile.";

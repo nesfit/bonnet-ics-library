@@ -5,6 +5,10 @@ namespace IcsMonitor
 {
     internal sealed partial class ConsoleService
     {
+        /// <summary>
+        /// Implements and registers Show-Devices command.
+        /// </summary>
+        /// <param name="command">The command object used to register the command.</param>
         private void ShowDevicesCommand(CommandLineApplication command)
         {
             command.Description = "Show a list of all available network devices.";

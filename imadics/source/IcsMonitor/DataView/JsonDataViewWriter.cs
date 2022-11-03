@@ -12,10 +12,16 @@ namespace Traffix.DataView
     /// </summary>
     internal class JsonDataViewWriter : DataViewWriterBase
     {
+        /// <summary>
+        /// The constructor of JSON data view writer.
+        /// </summary>
+        /// <param name="writer">The output writer.</param>
+        /// <param name="schema">the data view schema.</param>
         public JsonDataViewWriter(TextWriter writer, DataViewSchema schema) : base(writer, schema)
         {
         }
 
+        /// <inheritdoc/>
         protected override void WriteFooter()
         {
 
@@ -23,12 +29,14 @@ namespace Traffix.DataView
             Writer.WriteLine("]");
         }
 
+        /// <inheritdoc/>
         protected override void WriteHeader()
         {
             Writer.WriteLine("[");
         }
         bool firstRow = true;
 
+        /// <inheritdoc/>
         protected override void WriteRow(IEnumerable<KeyValuePair<string, object>> values)
         {
             if (!firstRow)
@@ -40,7 +48,7 @@ namespace Traffix.DataView
                 firstRow = false;
             }
 
-            var obj = GetExpando(values);
+            var obj = GetExpandoObject(values);
             try
             {
                 var jsonString = System.Text.Json.JsonSerializer.Serialize(obj);

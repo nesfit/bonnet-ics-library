@@ -6,9 +6,15 @@ using System.Linq;
 
 namespace IcsMonitor
 {
-
+    /// <summary>
+    /// Implementes command of the console application.
+    /// </summary>
     internal sealed partial class ConsoleService
     {
+        /// <summary>
+        /// Implements and registers Build-Profile command.
+        /// </summary>
+        /// <param name="command">The command object used to register the command.</param>
         private void BuidProfileCommand(CommandLineApplication command)
         {
             command.Description = "Create a profile for the given input and profile parameters.";

@@ -34,12 +34,26 @@ namespace IcsMonitor.Flows
             return new FlowMetrics(x.Packets + y.Packets, x.Octets + y.Octets, MinTicks(x.FirstSeen, y.FirstSeen), MaxTicks(x.LastSeen, y.LastSeen));
         }
 
+        /// <summary>
+        /// Gets the lower from the two provide ticks if they are greater than zero. 
+        /// Zero stands for invalid/undefined value.
+        /// </summary>
+        /// <param name="x">The first tick value.</param>
+        /// <param name="y">the second tick value.</param>
+        /// <returns>The smallest of the provided tick values.</returns>
         static long MinTicks(long x, long y)
         {
             if (x == 0) return y;
             if (y == 0) return x;
             return Math.Min(x, y);
         }
+        /// <summary>
+        /// Gets the greater from the two provide ticks. 
+        /// Zero stands for invalid/undefined value.
+        /// </summary>
+        /// <param name="x">The first tick value.</param>
+        /// <param name="y">the second tick value.</param>
+        /// <returns>The greatest of the provided tick values.</returns>
         static long MaxTicks(long x, long y)
         {
             if (x == 0) return y;

@@ -10,12 +10,18 @@ using System.Linq;
 namespace IcsMonitor.AnomalyDetection
 {
     /// <summary>
-    /// Represents traffic profile thar consists of a collection of models. 
-    /// The profile is used for detection of unusuall traffic patterns. 
+    /// Represents traffic profile that consists of a collection of models. 
+    /// The profile is used for anomaly detection provided the network traffic. 
     /// </summary>
     public class TrafficProfile
     {
+        /// <summary>
+        /// Name of the index file within the profile package.
+        /// </summary>
         const string indexYamlFile = "index.yaml";
+        /// <summary>
+        /// An entry specifying the input data transformer.
+        /// </summary>
         const string inputDataTransformerEntryName = "InputData.transform";
 
         /// <summary>
@@ -24,20 +30,54 @@ namespace IcsMonitor.AnomalyDetection
         /// </summary>
         internal struct Settings
         {
+            /// <summary>
+            /// The name of the profile.
+            /// </summary>
             public string ProfileName { get; set; }
+            /// <summary>
+            /// The industrial protocol of the profile.
+            /// </summary>
             public IndustrialProtocol ProtocolType { get; set; }
+            /// <summary>
+            /// The size of window interval. The traffic is aggregated in these windows 
+            /// during learning. It is required that the same window size is used also for detection.
+            /// </summary>
             public TimeSpan WindowTimeSpan { get; set; }
+            /// <summary>
+            /// The total count of models within the profile.
+            /// </summary>
             public int ModelCount { get; set; }
+            /// <summary>
+            /// The configuration given as key-value pairs.
+            /// </summary>
             public Dictionary<string, string> Configuration { get; set; }
         }
 
-
+        /// <summary>
+        /// The ML context object. 
+        /// </summary>
         private readonly MLContext _ml;
+        /// <summary>
+        /// The array of cluster models.
+        /// </summary>
         private readonly ClusterModel[] _models;
+        /// <summary>
+        /// The input data transformer. The transformer is created during learning but the same 
+        /// has to be used on data during testing. 
+        /// </summary>
         private readonly ITransformer _transformer;
+        /// <summary>
+        /// The expected schema of the input data view.
+        /// </summary>
         private readonly DataViewSchema _inputSchema;
+        /// <summary>
+        /// The configuration object of the profile.
+        /// </summary>
         private readonly Settings _settings;
 
+        /// <summary>
+        /// The configuration map. It is a collection of key-value pairs.
+        /// </summary>
         public IDictionary<string, string> Configuration => _settings.Configuration;
             
 
@@ -59,6 +99,13 @@ namespace IcsMonitor.AnomalyDetection
             _settings.ModelCount = models.Length;
             
         }
+        /// <summary>
+        /// Gets the data view source object for the protocol type of the current profile.
+        /// <para/>
+        /// Each protocol type has a different source object. The factory object is
+        /// <see cref="FlowsDataViewSource"/> that can provide data view source instance for all supported ICS protocols.
+        /// </summary>
+        /// <returns>The flows datav view source object usable with the current profile.</returns>
         public FlowsDataViewSource GetSource()
         {
             return FlowsDataViewSource.GetSource(ProtocolType);

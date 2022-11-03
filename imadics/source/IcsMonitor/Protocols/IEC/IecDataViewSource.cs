@@ -17,21 +17,32 @@ using Traffix.Core.Flows;
 
 namespace IcsMonitor.Protocols
 {
+    /// <summary>
+    /// Implements IEC data view source.
+    /// </summary>
     [Serializable]
     internal class IecDataViewSource : FlowsDataViewSource<PacketRecord<Packet>, IecCompact>
     {
-
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
         public IecDataViewSource(IDictionary<string, string> configuration) : base(configuration)
         { 
         }
 
+        /// <summary>
+        /// A list of feature columns for the dataview.
+        /// </summary>
         public override string[] FeatureColumns => new[] { "IEC104_PKT_LENGTH_VECTOR" }; //, "IEC104_ASDU_NUM_ITEMS_VECTOR" };
 
+        /// <inheritdoc/>
         public override Task<IDataView> GetDataViewAsync<TKey>(MLContext ml, IObservable<FlowRecord<TKey, IecCompact>> observable)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public override IObservable<System.Collections.Generic.List<FlowRecord<TKey, IecCompact>>> LoadDataFrom<TKey>(IObservable<PacketRecord<Packet>> source, TimeSpan windowSpan, Func<FlowKey, TKey> getKey)
         {
             throw new NotImplementedException();
@@ -53,7 +64,16 @@ namespace IcsMonitor.Protocols
             }
         }
 
+        /// <summary>
+        /// The type of CSV file to consume.
+        /// </summary>
         enum CsvFileType { Flowmon, Wireshark, Unknown, Invalid }  
+        /// <summary>
+        /// Detects kind of input CSV file.
+        /// </summary>
+        /// <param name="file">The input file.</param>
+        /// <param name="delimiter">The identified CSV delimiter. Each format can use its won delimiting character.</param>
+        /// <returns>The kind of CSV file.</returns>
         CsvFileType DetectInputFile(string file, out char delimiter)
         {
             using var stream = File.OpenRead(file);
@@ -69,17 +89,38 @@ namespace IcsMonitor.Protocols
             return CsvFileType.Unknown;
         }
 
+        /// <summary>
+        /// Loads source data from Wireshark's CSV file.
+        /// </summary>
+        /// <param name="mlContext">THe ML context.</param>
+        /// <param name="file">The source CSV file.</param>
+        /// <param name="delimiter">The CSV delimiter.</param>
+        /// <returns>A new data view object.</returns>
         public IDataView LoadFromWiresharkCsvFile(MLContext mlContext, string file, char delimiter)
         {
             var inputList = ReadRecordsFromWiresharkCsvFile(file, delimiter);
             return CreateDataView(mlContext, inputList, Path.ChangeExtension(file, "dump.csv"));
         }
+        /// <summary>
+        /// Loads source data from Flowmon's CSV file.
+        /// </summary>
+        /// <param name="mlContext">THe ML context.</param>
+        /// <param name="file">The source CSV file.</param>
+        /// <param name="delimiter">The CSV delimiter.</param>
+        /// <returns>A new data view object.</returns>
         public IDataView LoadFromFlowmonCsvFile(MLContext mlContext, string file, char delimiter)
         {
             var inputList = ReadRecordsFromFlowmonCsvFile(file, delimiter);
             return CreateDataView(mlContext, inputList, Path.ChangeExtension(file, "dump.csv"));
         }
 
+        /// <summary>
+        /// Creats a data view based on the provided enumerable of <seealso cref="IecDataViewRecord"/> objects.
+        /// </summary>
+        /// <param name="mlContext">the ML context.</param>
+        /// <param name="inputList">The input enumerable.</param>
+        /// <param name="dumpFile">Optional dump file to be populated with aggregated flow records.</param>
+        /// <returns>The new  <seealso cref="IDataView"/> object consisting of data from <paramref name="inputList"/>.</returns>
         private IDataView CreateDataView(MLContext mlContext, IEnumerable<IecDataViewRecord> inputList, string dumpFile = null)
         {
             var windowTimeSpan = TimeSpan.Parse(_configuration["window"]);
@@ -116,6 +157,11 @@ namespace IcsMonitor.Protocols
             return (windowStartDateTime.Ticks, windowTimeSpan.Ticks);
         }
 
+        /// <summary>
+        /// Write all <paramref name="records"/> to the given <paramref name="file"/>.
+        /// </summary>
+        /// <param name="file">The output file.</param>
+        /// <param name="records">An enumerable of records to write.</param>
         private static void WriteRecordsToCsvFile(string file, IEnumerable<IecDataViewRecord> records)
         {
             using (var writer = new StreamWriter(Path.ChangeExtension(file, "flows.csv")))
@@ -124,7 +170,12 @@ namespace IcsMonitor.Protocols
                 csvWriter.WriteRecords(records);
             }
         }
-
+        /// <summary>
+        /// Read <see cref="IecDataViewRecord"/> objects from the given Flowmon's CSV file.
+        /// </summary>
+        /// <param name="file">The source file.</param>
+        /// <param name="delimiter">A delimiter character.</param>
+        /// <returns>The enumerbale of  <see cref="IecDataViewRecord"/> objects.</returns>
         private IEnumerable<IecDataViewRecord> ReadRecordsFromFlowmonCsvFile(string file, char delimiter)
         {
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -137,6 +188,12 @@ namespace IcsMonitor.Protocols
             using var csvReader = new CsvReader(reader, config);
             return csvReader.GetRecords<IecDataViewRecordFlowmon>().Select(FlowmonToNativeRowMapping).ToList();
         }
+        /// <summary>
+        /// Read <see cref="IecDataViewRecord"/> objects from the given Wireshark's CSV file.
+        /// </summary>
+        /// <param name="file">The source file.</param>
+        /// <param name="delimiter">A delimiter character.</param>
+        /// <returns>The enumerbale of  <see cref="IecDataViewRecord"/> objects.</returns>
         private IEnumerable<IecDataViewRecord> ReadRecordsFromWiresharkCsvFile(string file, char delimiter)
         {
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -153,6 +210,13 @@ namespace IcsMonitor.Protocols
             return records;
         }
 
+        /// <summary>
+        /// Aggregates a group of <see cref="IecDataViewRecord"/>s in the single record.
+        /// It uses <see cref="IecDataViewRecord.Combine(IecDataViewRecord, IecDataViewRecord)"/> method to 
+        /// create a resulting aggregation.
+        /// </summary>
+        /// <param name="arg1">Group of <see cref="IecDataViewRecord"/>s. </param>
+        /// <returns>A single <see cref="IecDataViewRecord"/>aggregating a collection of recrods.</returns>
         private IecDataViewRecord Aggregate(IGrouping<(string FlowKey, (long Start, long Duration) Window), IecDataViewRecord> arg1)
         {
             var result = arg1.Aggregate(IecDataViewRecord.Combine);
@@ -162,16 +226,36 @@ namespace IcsMonitor.Protocols
             return result;
         }
 
+        /// <summary>
+        /// Encoder for TAG values. It helps with creating a TAG array and 
+        /// representing TAG-related counters.
+        /// </summary>
         class TagEncoder 
         {
+            /// <summary>
+            /// An array of tags.
+            /// </summary>
             string[] _tags;
+            /// <summary>
+            /// Maps tag string to its index in the Tag array.
+            /// </summary>
             Dictionary<string, int> _tagMap;
 
+            /// <summary>
+            /// Creates a new <see cref="TagEncoder"/> based on the provided array of Tags.
+            /// </summary>
+            /// <param name="tags">An array of operation Tags.</param>
             public TagEncoder(string[] tags)
             {
                 _tags = tags;
                 _tagMap = tags.Select((x, i) => new KeyValuePair<string, int>(x, i)).ToDictionary(x => x.Key, x => x.Value);
             }
+
+            /// <summary>
+            /// Encode the TAG of the given <paramref name="record"/>.
+            /// </summary>
+            /// <param name="record">The input record.</param>
+            /// <returns>The same instance as the input <paramref name="record"/> but with update TAG-related properties. </returns>
             public IecDataViewRecord Encode(IecDataViewRecord record)
             {
                 var operationIndex  = _tagMap.TryGetValue(record.OperationTag, out var index) ? index : 0;
@@ -187,6 +271,11 @@ namespace IcsMonitor.Protocols
             }
         }
 
+        /// <summary>
+        /// Converts Flowmon's IEC record to Data View record.
+        /// </summary>
+        /// <param name="input">The Flomwon's IEC record.</param>
+        /// <returns><see cref="IecDataViewRecord"/> for the given Flowmon's <paramref name="input"/> record. </returns>
         private IecDataViewRecord FlowmonToNativeRowMapping(IecDataViewRecordFlowmon input)
         {
             var output = new IecDataViewRecord();
@@ -209,16 +298,32 @@ namespace IcsMonitor.Protocols
             return output;
         }
 
+        /// <summary>
+        /// Extracts the TAG from the <paramref name="input"/> record.
+        /// </summary>
+        /// <param name="input">The input IEC record.</param>
+        /// <returns>the TAG string for the <paramref name="input"/> record.</returns>
         private string GetTagString(IecDataViewRecordFlowmon input)
         {
             return $"{input.IecFrameFormat}.{input.CauseOfTransmission}";
         }
+        /// <summary>
+        /// Extracts the TAG from the <paramref name="input"/> record.
+        /// </summary>
+        /// <param name="input">The input IEC record.</param>
+        /// <returns>the TAG string for the <paramref name="input"/> record.</returns>
         private string GetTagString(IecDataViewRecordWireshark input)
         {
             return $"{input.IecFrameFormat}.{input.CauseOfTransmission}";
         }
 
-        DateTime? OriginDateTime = null;
+
+        private DateTime? OriginDateTime = null;
+        /// <summary>
+        /// Converts Wireshark's IEC record to Data View record.
+        /// </summary>
+        /// <param name="input">The Wireshark's IEC record.</param>
+        /// <returns><see cref="IecDataViewRecord"/> for the given Wireshark's <paramref name="input"/> record. </returns>
         private IecDataViewRecord WiresharkToNativeRowMapping(IecDataViewRecordWireshark input, int recordIndex)
         {
             if (OriginDateTime == null) OriginDateTime = input.StartDateTime;
@@ -244,12 +349,14 @@ namespace IcsMonitor.Protocols
         }
 
 
-
+        /// <inheritdoc/>
         public override IObservable<PacketRecord<Packet>> LoadFromDevice(ICaptureDevice captureDevice, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
+
+        /// <inheritdoc/>
         public override IObservable<PacketRecord<Packet>> LoadFromFile(string inputCaptureFile, string inputLabelFile, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();

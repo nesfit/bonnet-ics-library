@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace Traffix.DataView
 {
+    /// <summary>
+    /// The extension class implementing project's specific transformers.  
+    /// </summary>
     public static class TraffixTransformsCatalog
     {
         /// <summary>
@@ -22,7 +25,5 @@ namespace Traffix.DataView
             var pipeline = convertors.Aggregate(new EstimatorChain<TypeConvertingTransformer>(), (x, y) => x.Append(y)).Append(transforms.Concatenate(featureColumnName, sourceColumns));
             return pipeline;
         }
-
-
     }
 }

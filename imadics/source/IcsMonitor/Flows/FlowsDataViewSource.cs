@@ -20,8 +20,15 @@ namespace IcsMonitor.Flows
     /// </summary>
     public abstract class FlowsDataViewSource
     {
+        /// <summary>
+        /// The configuration collection.
+        /// </summary>
         protected Dictionary<string, string> _configuration;
 
+        /// <summary>
+        /// Protected constructor for the data view source.
+        /// </summary>
+        /// <param name="configuration">The configuration of the data source.</param>
         protected FlowsDataViewSource(IDictionary<string, string> configuration)
         {
 
@@ -48,12 +55,17 @@ namespace IcsMonitor.Flows
         /// Collection of column names that are used to compute Features vector.
         /// </summary>
         public abstract IReadOnlyCollection<string> FeatureColumns { get; }
+
+        /// <summary>
+        /// Gets the configuration as the key to value mapping.
+        /// </summary>
         public Dictionary<string, string> Configuration => _configuration;
 
         /// <summary>
         /// Loads packets and optionally labels from the input packet capture file and label file, respectively.
         /// <param name="inputCaptureFile">the name of packet capture file.</param>
         /// <param name="inputLabelFile">the name of label file. If null then labels are not read.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>An observable of packets loaded from the input file.</returns>
         public static IObservable<PacketRecord<Packet>> LoadPacketsFromFile(string inputCaptureFile, string inputLabelFile, CancellationToken cancellationToken)
         {
@@ -70,16 +82,61 @@ namespace IcsMonitor.Flows
             }
         }
 
+        /// <summary>
+        /// Loads packets and optionally labels from the input packet capture device.
+        /// <param name="inputCaptureFile">the name of packet capture file.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>An observable of packets loaded from the input file.</returns>
         public static IObservable<PacketRecord<Packet>> LoadPacketsFromDevice(ICaptureDevice captureDevice, CancellationToken cancellationToken)
         {
             return Observable.Create<PacketRecord<Packet>>(observer => PacketDeviceSource.Subscribe(captureDevice, observer, cancellationToken));
         }
 
+        /// <summary>
+        /// Loads and Aggregates ICS traffic from the given source. 
+        /// </summary>
+        /// <typeparam name="TKey">The type of the flow key.</typeparam>
+        /// <param name="mlContext">The ML context object required for some data view related operations.</param>
+        /// <param name="inputCaptureFile">The input capture file name.</param>
+        /// <param name="inputLabelFile">the input label file name.</param>
+        /// <param name="windowTimeSpan">The size of the time-aggregation window.</param>
+        /// <param name="getKey">The function used to get key from the flow record.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The task that when the method completes provide loaded data view.</returns>
         public abstract Task<IDataView> LoadAndAggregateAsync<TKey>(MLContext mlContext, string inputCaptureFile, string inputLabelFile, TimeSpan windowTimeSpan, Func<FlowKey, TKey> getKey, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Reads and Aggregates ICS traffic from the given source.
+        /// </summary>
+        /// <typeparam name="TKey">The type of the flow key.</typeparam>
+        /// <param name="mlContext">The ML context object required for some data view related operations.</param>
+        /// <param name="captureDevice">The input capture device use to read the traffic from.</param>
+        /// <param name="windowTimeSpan">The size of the time-aggregation window.</param>
+        /// <param name="getKey">The function used to get key from the flow record.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The observable object providing data views of read and aggregated flow records.</returns>
         public abstract IObservable<IDataView> ReadAndAggregateAsync<TKey>(MLContext mlContext, ICaptureDevice captureDevice, TimeSpan windowTimeSpan, Func<FlowKey, TKey> getKey, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Reads and Aggregates ICS traffic from the given source.
+        /// </summary>
+        /// <typeparam name="TKey">The type of the flow key.</typeparam>
+        /// <param name="mlContext">The ML context object required for some data view related operations.</param>
+        /// <param name="captureDevice">The input capture device use to read the traffic from.</param>
+        /// <param name="windowTimeSpan">The size of the time-aggregation window.</param>
+        /// <param name="windowCount">The total count of windows to process.</param>
+        /// <param name="getKey">The function used to get key from the flow record.</param>
+        /// <param name="onNext">On next callback for observe new objects. This can be used, e.g., for progress reporting and logging.</param>
+        /// <param name="cancellationToken">The canclellation token.</param>
+        /// <returns></returns>
         public abstract Task<IDataView> ReadAllAndAggregateAsync<TKey>(MLContext mlContext, ICaptureDevice captureDevice, TimeSpan windowTimeSpan, int windowCount, Func<FlowKey, TKey> getKey, Action<IEnumerable<object>> onNext, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// Loads the data view from CSV source file.
+        /// </summary>
+        /// <param name="mlContext">The ML context object.</param>
+        /// <param name="file">The CSV file name.</param>
+        /// <returns></returns>
         public abstract IDataView LoadFromCsvFile(MLContext mlContext, string file); 
     }
 
@@ -92,6 +149,12 @@ namespace IcsMonitor.Flows
         private readonly IObserver<PacketRecord<Packet>> _observer;
         private readonly CancellationToken _cancellationToken;
 
+        /// <summary>
+        /// Creates a new packet device source.
+        /// </summary>
+        /// <param name="captureDevice">The underlying capture device.</param>
+        /// <param name="observer">The observer to consume the packets.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         internal PacketDeviceSource(ICaptureDevice captureDevice, IObserver<PacketRecord<Packet>> observer, CancellationToken cancellationToken)
         {
             _captureDevice = captureDevice;
@@ -102,11 +165,17 @@ namespace IcsMonitor.Flows
             _cancellationToken = cancellationToken;
         }
 
+        /// <summary>
+        /// Callback.
+        /// </summary>
         private void _captureDevice_OnCaptureStopped(object sender, CaptureStoppedEventStatus status)
         {
             _observer.OnCompleted();
         }
-
+        
+        /// <summary>
+        /// Callback.
+        /// </summary>
         private void _captureDevice_OnPacketArrival(object sender, CaptureEventArgs e)
         {
             if (_cancellationToken.IsCancellationRequested)
@@ -121,18 +190,30 @@ namespace IcsMonitor.Flows
             }
         }
 
-
-        public int PacketCount
-        { get; private set; }
+        /// <summary>
+        /// Gets the number of packets provided so far.
+        /// </summary>
+        public int PacketCount { get; private set; }
+        /// <inheritdoc/>
         public void Dispose()
         {
             if (_captureDevice.Started) Close();
         }
+        /// <summary>
+        /// Subsrcibes the <paramref name="observer"/> to the newly created packet source provider based on <paramref name="captureDevice"/>.
+        /// </summary>
+        /// <param name="captureDevice">The capture device.</param>
+        /// <param name="observer">the observer object.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>Disposable that can be used to unsubscribe from the observable.</returns>
         public static IDisposable Subscribe(ICaptureDevice captureDevice, IObserver<PacketRecord<Packet>> observer, CancellationToken cancellationToken)
         {
             var tf = new PacketDeviceSource(captureDevice, observer, cancellationToken);
             return tf;
         }
+        /// <summary>
+        /// Closes the packet source provider.
+        /// </summary>
         public void Close()
         {
             if (_captureDevice.Started) 
@@ -147,16 +228,22 @@ namespace IcsMonitor.Flows
     /// <typeparam name="TInput">The type of input object that this data source can process.</typeparam>
     public abstract class FlowsDataViewSource<TInput, TRecord> : FlowsDataViewSource
     {
+        /// <summary>
+        /// Creates a new instance of the class.
+        /// </summary>
+        /// <param name="configuration"></param>
         protected FlowsDataViewSource(IDictionary<string, string> configuration) : base(configuration)
         {
         }
 
+        /// <inheritdoc/>
         public override Task<IDataView> LoadAndAggregateAsync<TKey>(MLContext mlContext, string inputCaptureFile, string inputLabelFile, TimeSpan windowTimeSpan, Func<FlowKey, TKey> getKey, CancellationToken cancellationToken)
         {
             var observable = LoadDataFrom(LoadFromFile(inputCaptureFile, inputLabelFile, cancellationToken), windowTimeSpan, getKey);
             return GetDataViewAsync(mlContext, observable.SelectMany(x=>x));
         }
 
+        /// <inheritdoc/>
         public override IObservable<IDataView> ReadAndAggregateAsync<TKey>(MLContext mlContext, ICaptureDevice captureDevice, TimeSpan windowTimeSpan, Func<FlowKey, TKey> getKey, CancellationToken cancellationToken)
         {
             var sourceObservable = LoadFromDevice(captureDevice, cancellationToken);
@@ -164,6 +251,7 @@ namespace IcsMonitor.Flows
             return observable.SelectMany(flows => GetDataViewAsync(mlContext, flows.ToObservable()));
         }
 
+        /// <inheritdoc/>
         public override Task<IDataView> ReadAllAndAggregateAsync<TKey>(MLContext mlContext, ICaptureDevice captureDevice, TimeSpan windowTimeSpan, int windowCount, Func<FlowKey, TKey> getKey, Action<IEnumerable<object>> onNext, CancellationToken cancellationToken)
         {
             var sourceObservable = LoadFromDevice(captureDevice, cancellationToken);
@@ -171,7 +259,20 @@ namespace IcsMonitor.Flows
             return GetDataViewAsync(mlContext, observable.SelectMany(x => x));
         }
 
+        /// <summary>
+        /// Loads the input data from the capture devices and provides it in form of observable collection.
+        /// </summary>
+        /// <param name="captureDevice">The input capture device.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>The observable collection of <typeparamref name="TInput"/> records.</returns>
         public abstract IObservable<TInput> LoadFromDevice(ICaptureDevice captureDevice, CancellationToken cancellationToken);
+        /// <summary>
+        ///  Loads the input data from the input capture fileand provides it in form of observable collection.
+        /// </summary>
+        /// <param name="inputCaptureFile">The input capture file.</param>
+        /// <param name="inputLabelFile">The input label file.</param>
+        /// <param name="cancellationToken">The cancellaiton token.</param>
+        /// <returns></returns>
         public abstract IObservable<TInput> LoadFromFile(string inputCaptureFile, string inputLabelFile, CancellationToken cancellationToken);
         /// <summary>
         /// Loads data from the given source file and provides them in batches as observable sequence.
@@ -197,7 +298,7 @@ namespace IcsMonitor.Flows
         /// <summary>
         /// A special version of select many. 
         /// <para/>
-        /// It makes a flat observation from the windowd observation of records.
+        /// It makes a flat observation from the windowed observation of records.
         /// </summary>
         /// <typeparam name="TRecord">The type of records.</typeparam>
         /// <param name="observable">An inout observable.</param>

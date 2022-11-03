@@ -24,6 +24,11 @@ namespace IcsMonitor
         private readonly ILogger _logger;
         private readonly MLContext _mlContext;
 
+        /// <summary>
+        /// Creates a new instance of the context.
+        /// </summary>
+        /// <param name="mLContext">A machine learning context instance.</param>
+        /// <param name="logger">A logger instance.</param>
         public TrafficMonitorContext(MLContext mLContext, ILogger<TrafficMonitorContext> logger)
         {
             _logger = logger;
@@ -33,8 +38,8 @@ namespace IcsMonitor
         /// <summary>
         /// Prints information about the learned profile.
         /// </summary>
-        /// <param name="profileFile"></param>
-        /// <param name="textWriter"></param>
+        /// <param name="profileFile">The profile file object.</param>
+        /// <param name="textWriter">The text writer use to print information.</param>
         public async Task PrintProfileAsync(TrafficProfile profile, TextWriter textWriter)
         {
             var serializer = new SerializerBuilder()
@@ -164,6 +169,9 @@ namespace IcsMonitor
             captureDevice.Close();
         }
 
+        /// <summary>
+        /// Enumeration for possible feature transformaiton/dimension reduction.
+        /// </summary>
         public enum FeatureTransformOperation { Pca, Direct, Average }
         /// <summary>
         /// Creates the profile from the source data and provided options.
@@ -186,6 +194,9 @@ namespace IcsMonitor
             return profile;
         }
 
+        /// <summary>
+        /// Deinfes the target PCS rank, if PCA feature spae transformation is in use.
+        /// </summary>
         public int PcaRank { get; set; } = 3;
 
         /// <summary>

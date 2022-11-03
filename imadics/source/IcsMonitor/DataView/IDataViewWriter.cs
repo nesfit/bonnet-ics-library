@@ -4,7 +4,7 @@ using System;
 namespace Traffix.DataView
 {
     /// <summary>
-    /// An interface for data view writers. 
+    /// A common interface for implementations of data view writers. 
     /// </summary>
     public interface IDataViewWriter : IDisposable
     {

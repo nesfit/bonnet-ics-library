@@ -8,6 +8,10 @@ namespace IcsMonitor
 {
     internal sealed partial class ConsoleService
     {
+        /// <summary>
+        /// Implements and registers Test-Flows command.
+        /// </summary>
+        /// <param name="command">The command object used to register the command.</param>
         private void TestFlowsCommand(CommandLineApplication command)
         {
             command.Description = "Test input flows using the created profile.";

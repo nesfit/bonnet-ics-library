@@ -14,6 +14,9 @@ namespace IcsMonitor.AnomalyDetection
     /// </summary>
     public class ModelTrainer
     {
+        /// <summary>
+        /// The MLCOntext instance required for performing operations in the current object.
+        /// </summary>
         private readonly MLContext _mlContext;
 
         /// <summary>

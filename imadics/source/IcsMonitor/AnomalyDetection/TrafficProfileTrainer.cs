@@ -68,13 +68,16 @@ namespace IcsMonitor.AnomalyDetection
         /// Uses PCA method to compute features from pre-features.
         /// </summary>
         /// <param name="rank">The rank of the resulting PCA. </param>
+        /// <returns>The input to output estimator function.</returns>
         public Func<IEstimator<ITransformer>, IEstimator<ITransformer>> PcaTransformer(int rank) =>
             (IEstimator<ITransformer> estimator) => estimator.Append(_ml.Transforms.NormalizeMinMax("PreFeatures", fixZero: true))
                                                              .Append(_ml.Transforms.ProjectToPrincipalComponents("Features", "PreFeatures", rank: rank));
 
         /// <summary>
-        /// Direct transformation - copies prefetures to features.
+        /// The direct transformation. It just uses the input features as output features.
         /// </summary>
+        /// <param name="estimator">The input estimator.</param>
+        /// <returns>A new estimator with a direct transformer applied.</returns>
         public IEstimator<ITransformer> DirectTransformer(IEstimator<ITransformer> estimator)
         {
             return estimator.Append(_ml.Transforms.NormalizeMinMax("PreFeatures", fixZero: true))
@@ -84,9 +87,8 @@ namespace IcsMonitor.AnomalyDetection
         /// <summary>
         /// Computes MIN,MAX,AVG,STDEV from the prefeatures. 
         /// </summary>
-        /// <param name="estimator"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <param name="estimator">The input estimator.</param>
+        /// <returns>The output estimator with transformer applied.</returns>
         public IEstimator<ITransformer> AverageTransformer(IEstimator<ITransformer> estimator)
         {
             return estimator.Append(_ml.Transforms.CustomMapping(new AverageTransformerCustomAction().GetMapping(), contractName: "AverageTransformer"));
@@ -133,12 +135,19 @@ namespace IcsMonitor.AnomalyDetection
             }
         }
 
+        /// <summary>
+        /// The class implements a custom transformer that performs min/max/avg computation for input features.
+        /// </summary>
         [CustomMappingFactoryAttribute("AverageTransformer")]
-        private class AverageTransformerCustomAction : CustomMappingFactory<InputFeatureData,
-          OutputFeatureData>
+        private class AverageTransformerCustomAction : CustomMappingFactory<InputFeatureData, OutputFeatureData>
         {
             // We define the custom mapping between input and output rows that will
             // be applied by the transformation.
+            /// <summary>
+            /// Custom mapping between <paramref name="input"/> and <paramref name="output"/> data.
+            /// </summary>
+            /// <param name="input">The input feature data.</param>
+            /// <param name="output">the output feature data.</param>
             public static void CustomAction(InputFeatureData input, OutputFeatureData output)
             {
                 output.Features = new float[]
@@ -149,22 +158,43 @@ namespace IcsMonitor.AnomalyDetection
                     StandardDeviation(input.PreFeatures)
                 };
             }
+            /// <summary>
+            /// Gets the mapping object.
+            /// </summary>
+            /// <returns>the mmaping object of this custom transformation.</returns>
             public override Action<InputFeatureData, OutputFeatureData> GetMapping()
                 => CustomAction;
         }
 
+        /// <summary>
+        /// Reepresents input feature data.
+        /// </summary>
         public class InputFeatureData
         {
+            /// <summary>
+            /// Features are represented as an array of float values.
+            /// </summary>
             [ColumnName("PreFeatures")]
             public float[] PreFeatures { get; set; }
         }
 
+        /// <summary>
+        /// Represents output feature data.
+        /// </summary>
         public class OutputFeatureData
         {
+            /// <summary>
+            /// Features are represented as an array of float values.
+            /// </summary>
             [ColumnName("Features")]
             [VectorType(4)]
             public float[] Features { get; set; }
         }
+        /// <summary>
+        /// Computes a standard deviation for the given sequence of values.
+        /// </summary>
+        /// <param name="sequence">The input sequence of float values.</param>
+        /// <returns>the computed standard deviation.</returns>
         static float StandardDeviation(IEnumerable<float> sequence)
         { 
             if (sequence.Any())

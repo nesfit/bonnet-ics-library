@@ -3,6 +3,9 @@ using System.IO;
 
 namespace Traffix.DataView
 {
+    /// <summary>
+    /// Defines supported data output formats.
+    /// </summary>
     public enum OutputFormat { Json, Csv, Yaml, Markdown }
     /// <summary>
     /// The fatory for providing writers of the supported file formats.

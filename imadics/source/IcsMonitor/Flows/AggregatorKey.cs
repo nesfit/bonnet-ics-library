@@ -3,8 +3,29 @@ using Traffix.Core.Flows;
 
 namespace IcsMonitor.Flows
 {
+    /// <summary>
+    /// Represents a multiflow key used to aggregate records. This is the compound key.
+    /// It aggreagtes flows to multiflow such that all flows in the bag have the same 
+    /// protocol types, client address, server address and the server port.
+    /// </summary>
+    /// <param name="ProtocolType">The protocol type.</param>
+    /// <param name="ClientIpAddress">The client address.</param>
+    /// <param name="ServerIpAddress">The server address.</param>
+    /// <param name="ServerPort">The server port.</param>
     public record MultiflowKey(System.Net.Sockets.ProtocolType ProtocolType, IPAddress ClientIpAddress, IPAddress ServerIpAddress, ushort ServerPort);
+    /// <summary>
+    /// Represents a biflow key used to aggregate the flow records. 
+    /// It aggregates the flows of bidirectional conversations. 
+    /// </summary>
+    /// <param name="ProtocolType">the protocol type.</param>
+    /// <param name="ClientIpAddress">The client address.</param>
+    /// <param name="ClientPort">The client port.</param>
+    /// <param name="ServerIpAddress">The server address.</param>
+    /// <param name="ServerPort">The server port.</param>
     public record BiflowKey(System.Net.Sockets.ProtocolType ProtocolType, IPAddress ClientIpAddress, ushort ClientPort, IPAddress ServerIpAddress, ushort ServerPort);
+    /// <summary>
+    /// This static class provides different aggregation keys. 
+    /// </summary>
     public static class AggregatorKey
     {
         /// <summary>

@@ -17,12 +17,26 @@ namespace Traffix.DataView
     {
         private bool _disposed;
 
+        /// <summary>
+        /// Gets the indented writer used for writing the output.
+        /// </summary>
         protected IndentedTextWriter Writer { get; }
 
+        /// <summary>
+        /// Gets the associated data view schmema.
+        /// </summary>
         protected DataViewSchema Schema { get; }
 
+        /// <summary>
+        /// Gets the collection of schema columns.
+        /// </summary>
         protected DataViewSchema.Column[] Columns { get; }
 
+        /// <summary>
+        /// The constructor.
+        /// </summary>
+        /// <param name="writer">The writer used to produce the output.</param>
+        /// <param name="schema">The data view schema.</param>
         protected DataViewWriterBase(TextWriter writer, DataViewSchema schema)
         {
             Writer = new IndentedTextWriter(writer, "  ");
@@ -31,6 +45,10 @@ namespace Traffix.DataView
 
         }
 
+        /// <summary>
+        /// Implements the dispose pattern.
+        /// </summary>
+        /// <param name="disposing">True if object is being disposed.</param>
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed)
@@ -43,19 +61,23 @@ namespace Traffix.DataView
                 CleanUp();
                 Writer.Dispose();
             }
-
-            // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-            // TODO: set large fields to null.
-
             _disposed = true;
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Gets the string value for the given column.
+        /// </summary>
+        /// <param name="column">The data view column.</param>
+        /// <param name="cursor">The cursor pointing to the actual row in the data view.</param>
+        /// <returns></returns>
+        /// <exception cref="NotSupportedException"></exception>
         protected static object GetStringValueForColumn(DataViewSchema.Column column, DataViewRowCursor cursor)
         {
             switch (column.Type)
@@ -82,6 +104,14 @@ namespace Traffix.DataView
             throw new NotSupportedException($"The data view type {column.Type} is not supported");
         }
 
+        /// <summary>
+        /// Gets the vector value for the given field in data view.
+        /// </summary>
+        /// <param name="cursor">The row cursor.</param>
+        /// <param name="column">the data view column.</param>
+        /// <param name="itemType">The type of field.</param>
+        /// <returns>The vector value representing the given field.</returns>
+        /// <exception cref="NotSupportedException">For types that are not representable as vector values.</exception>
         protected static object GetVectorValue(DataViewRowCursor cursor, DataViewSchema.Column column, PrimitiveDataViewType itemType)
         {
             if (itemType.RawType == typeof(float))
@@ -96,17 +126,37 @@ namespace Traffix.DataView
             }
             throw new NotSupportedException($"The data view type {itemType} is not supported");
         }
+
+        /// <summary>
+        /// Gets the field value as an object of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The required object type.</typeparam>
+        /// <param name="cursor">The row cursor.</param>
+        /// <param name="column">The data view column.</param>
+        /// <returns>The field value of type <typeparamref name="T"/>. </returns>
         protected static T GetValue<T>(DataViewRowCursor cursor, DataViewSchema.Column column)
         {
             T value = default;
             cursor.GetGetter<T>(column)(ref value);
             return value;
         }
+        /// <summary>
+        /// Gets the field value as text (string).
+        /// </summary>
+        /// <param name="cursor">The row cursor.</param>
+        /// <param name="column">The data view column.</param>
+        /// <returns>The string representing the field value.</returns>
         protected static string GetTextValue(DataViewRowCursor cursor, DataViewSchema.Column column)
         {
             var value = GetValue<ReadOnlyMemory<char>>(cursor, column);
             return value.ToString();
         }
+        /// <summary>
+        /// Gets the values of the given colleciton of columns.
+        /// </summary>
+        /// <param name="cursor">The row cursor.</param>
+        /// <param name="columns">The colleciton of columns to retrieve.</param>
+        /// <returns>The key-value pairs representing the values for the requested columns at the given cursor.</returns>
         protected static IEnumerable<KeyValuePair<string, object>> GetValues(DataViewRowCursor cursor, DataViewSchema.Column[] columns)
         {
             foreach (var column in columns)
@@ -174,6 +224,11 @@ namespace Traffix.DataView
             WriteFooter();
         }
 
+        /// <summary>
+        /// Gets the expando object for the given key-value pairs.
+        /// </summary>
+        /// <param name="values">Values with their column names.</param>
+        /// <returns>The expando object for the given colleciton of key-values.</returns>
         protected ExpandoObject GetExpandoScheme(IEnumerable<KeyValuePair<string, object>> values)
         {
             var obj = new ExpandoObject();
@@ -183,7 +238,12 @@ namespace Traffix.DataView
             }
             return obj;
         }
-        protected ExpandoObject GetExpando(IEnumerable<KeyValuePair<string, object>> values)
+        /// <summary>
+        /// Gets the expando object for the given key-value pairs.
+        /// </summary>
+        /// <param name="values">Values with their column names.</param>
+        /// <returns>The expando object for the given colleciton of key-values.</returns>
+        protected ExpandoObject GetExpandoObject(IEnumerable<KeyValuePair<string, object>> values)
         {
             var obj = new ExpandoObject();
             foreach (var item in values)

@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 namespace IcsMonitor.AnomalyDetection
 {
+    /// <summary>
+    /// Defines common interface for anomaly detection models. 
+    /// </summary>
+    /// <typeparam name="TOutput">The output type of the model.</typeparam>
     public interface IAnomalyDetectionModel<TOutput>
     {
         /// <summary>

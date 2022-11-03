@@ -13,6 +13,11 @@ namespace Traffix.DataView
     {
         private readonly ISerializer _serializer;
 
+        /// <summary>
+        /// The constructor of JSON data view writer.
+        /// </summary>
+        /// <param name="writer">The output writer.</param>
+        /// <param name="schema">the data view schema.</param>
         public YamlDataViewWriter(TextWriter writer, DataViewSchema schema) : base(writer, schema)
         {
             _serializer = new SerializerBuilder()
@@ -20,21 +25,21 @@ namespace Traffix.DataView
             .Build();
 
         }
-
+        /// <inheritdoc/>
         protected override void WriteFooter()
         {
 
         }
-
+        /// <inheritdoc/>
         protected override void WriteHeader()
         {
 
         }
-
+        /// <inheritdoc/>
         protected override void WriteRow(IEnumerable<KeyValuePair<string, object>> values)
         {
 
-            var obj = GetExpando(values);
+            var obj = GetExpandoObject(values);
             var yaml = _serializer.Serialize(obj);
             Writer.WriteLine("-");
             Writer.Indent += 1;

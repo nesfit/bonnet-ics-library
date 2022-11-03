@@ -9,6 +9,10 @@ namespace IcsMonitor
 {
     internal sealed partial class ConsoleService
     {
+        /// <summary>
+        /// Implements and registers Export-Flows command.
+        /// </summary>
+        /// <param name="command">The command object used to register the command.</param>
         private void ExportFlowsCommand(CommandLineApplication command)
         {
             command.Description = "Export flows from the capture file or live capture.";

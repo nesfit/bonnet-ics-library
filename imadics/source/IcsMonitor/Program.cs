@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace IcsMonitor
 {
+    /// <summary>
+    /// The main class of the tool. It manages application registration and controls the lifetime.
+    /// </summary>
     public sealed class Program
     {
+        /// <summary>
+        /// The entry point of the application.
+        /// </summary>
+        /// <param name="args">Input arguments.</param>
+        /// <returns>Task that completes on exit.</returns>
         public static async Task Main(string[] args)
         {
             await Host.CreateDefaultBuilder(args)

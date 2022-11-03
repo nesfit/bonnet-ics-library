@@ -7,9 +7,9 @@ namespace IcsMonitor
     internal sealed partial class ConsoleService
     {
         /// <summary>
-        /// Prints the profile information in YAML format.
+        /// Implements and registers Show-Profile command.
         /// </summary>
-        /// <param name="command">The command.</param>
+        /// <param name="command">The command object used to register the command.</param>
         private void ShowProfileCommand(CommandLineApplication command)
         {
             command.Description = "Prints the stored profile in user readable format.";

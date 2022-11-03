@@ -20,11 +20,29 @@ namespace IcsMonitor.AnomalyDetection
     /// </summary>
     public class ClusterModel : IAnomalyDetectionModel<ClusterModel.Output>
     {
+        /// <summary>
+        /// The input transformer applied to the date before they are processed by the model.
+        /// </summary>
         private readonly ITransformer _transformer;
+        /// <summary>
+        /// The input data view schema.
+        /// </summary>
         private readonly DataViewSchema _inputSchema;
+        /// <summary>
+        /// A vector of variances.
+        /// </summary>
         private readonly float[] _variances;
+        /// <summary>
+        /// A vector of feature column names. 
+        /// </summary>
         private readonly string[] _featureColumnNames;
+        /// <summary>
+        /// A vector of computed centroids.
+        /// </summary>
         private readonly float[][] _centroids;
+        /// <summary>
+        /// Mapping of feature names to their indexes in the feature vector.
+        /// </summary>
         private readonly Dictionary<string, int> _featureMap;
 
         /// <summary>
@@ -59,7 +77,7 @@ namespace IcsMonitor.AnomalyDetection
         public class Output
         {
             /// <summary>
-            /// Get the window label.
+            /// Gets the window label.
             /// </summary>
             public string WindowLabel;
             /// <summary>

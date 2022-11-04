@@ -28,6 +28,10 @@ namespace IcsMonitor.Modbus
     {
         const int ModbusPort = 502;
 
+        /// <summary>
+        /// Creates data view source.
+        /// </summary>
+        /// <param name="configuration">The configuration object.</param>
         public ModbusDataViewSource(IDictionary<string, string> configuration) : base(configuration)
         {
 
@@ -40,6 +44,7 @@ namespace IcsMonitor.Modbus
                 "DataUndefinedRequests", "DataMalformedRequests", "DataResponsesSuccess", "DataResponsesError", "DataMalformedResponses" };
 
 
+        /// <inheritdoc/>
         public override IObservable<List<FlowRecord<TKey,ModbusCompact>>> LoadDataFrom<TKey>(IObservable<PacketRecord<Packet>> source, TimeSpan windowSpan, Func<FlowKey, TKey> getKey)
         {
             var observable = source.Where(p => p.Key.SourcePort == ModbusPort || p.Key.DestinationPort == ModbusPort);
@@ -56,6 +61,7 @@ namespace IcsMonitor.Modbus
             }).Merge();
         }
 
+        /// <inheritdoc/>
         public override Task<IDataView> GetDataViewAsync<TKey>(MLContext ml, IObservable<FlowRecord<TKey,ModbusCompact>> observable)
         {
             var enumerable =  observable.ToEnumerable();
@@ -71,10 +77,13 @@ namespace IcsMonitor.Modbus
             return Task.FromResult(dataview);
         }
 
+        /// <inheritdoc/>
         public override IObservable<PacketRecord<Packet>> LoadFromFile(string inputCaptureFile, string inputLabelFile, CancellationToken cancellationToken) => LoadPacketsFromFile(inputCaptureFile, inputLabelFile, cancellationToken);
 
+        /// <inheritdoc/>
         public override IObservable<PacketRecord<Packet>> LoadFromDevice(ICaptureDevice captureDevice, CancellationToken cancellationToken) => LoadPacketsFromDevice(captureDevice, cancellationToken);
 
+        /// <inheritdoc/>
         public override IDataView LoadFromCsvFile(MLContext mlContext, string file)
         {
             //var dv =  mlContext.Data.LoadFromTextFile<ModbusDataViewRecord>(file, separatorChar: ',', hasHeader: true, allowQuoting: true, trimWhitespace: true);
@@ -98,6 +107,12 @@ namespace IcsMonitor.Modbus
             var prev = dv.Preview();
             return dv;
         }
+        /// <summary>
+        /// Converts JSON string to the value of the given type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">the type of the value.</typeparam>
+        /// <param name="s">The input string.</param>
+        /// <returns>the value of type <typeparamref name="T"/> converted from JSON input string <paramref name="s"/>. </returns>
         T ConvertFromJson<T>(String s)
         {
             var value = JsonSerializer.Deserialize<T>(s);

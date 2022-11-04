@@ -108,6 +108,12 @@ namespace IcsMonitor.Modbus
             return record;
         }
 
+        /// <summary>
+        /// Aggregates flow labels to produce a new label.
+        /// </summary>
+        /// <param name="x">The first label.</param>
+        /// <param name="y">the second label.</param>
+        /// <returns>The new label which is the sum of the source labels.</returns>
         private static string AggregateFlowLabel(string x, string y)
         {
             Int32.TryParse(x, out var xn);
@@ -115,6 +121,11 @@ namespace IcsMonitor.Modbus
             return (xn + yn).ToString();
         }
         #region Packet update methods
+        /// <summary>
+        /// Updates the <paramref name="request"/> with information from <paramref name="arg"/> packets.
+        /// </summary>
+        /// <param name="request">The modbus data to be updated.</param>
+        /// <param name="arg">The packet used to update MODBUS request object.</param>
         private static void UpdateRequest(ref ModbusRawData request, PacketRecord<Packet> arg)
         {
             var tcpPacket = arg.Packet.Extract<TcpPacket>();
@@ -203,6 +214,11 @@ namespace IcsMonitor.Modbus
                 }
             }
         }
+        /// <summary>
+        /// UPdate MODBUS response object with data from <paramref name="arg"/> packet.
+        /// </summary>
+        /// <param name="response">The MODBUS response object.</param>
+        /// <param name="arg">The packet record.</param>
         private static void UpdateResponse(ref ModbusRawData response, PacketRecord<Packet> arg)
         {
             var tcpPacket = arg.Packet.Extract<TcpPacket>();
@@ -346,6 +362,13 @@ namespace IcsMonitor.Modbus
                 }
             }
         }
+        /// <summary>
+        /// Parses input <paramref name="stream"/> to MODBUS request <paramref name="packet"/>.
+        /// </summary>
+        /// <param name="stream">The input binary stream.</param>
+        /// <param name="packet">The output parsed packet.</param>
+        /// <param name="exception">The expection if the parsing fails.</param>
+        /// <returns>True on the success otherwise false.</returns>
         private static bool TryParseModbusRequestPacket(KaitaiStream stream, out ModbusRequestPacket packet, out Exception exception)
         {
             try
@@ -361,6 +384,13 @@ namespace IcsMonitor.Modbus
                 return false;
             }
         }
+        /// <summary>
+        /// Parses input <paramref name="stream"/> to MODBUS response <paramref name="packet"/>.
+        /// </summary>
+        /// <param name="stream">The input binary stream.</param>
+        /// <param name="packet">The output parsed packet.</param>
+        /// <param name="exception">The expection if the parsing fails.</param>
+        /// <returns>True on the success otherwise false.</returns>
         private static bool TryParseModbusResponsePacket(KaitaiStream stream, out ModbusResponsePacket packet, out Exception exception)
         {
             try
@@ -378,6 +408,11 @@ namespace IcsMonitor.Modbus
         }
         #endregion
 
+        /// <summary>
+        /// Gets the flow key from the given <paramref name="source"/> packet.
+        /// </summary>
+        /// <param name="source">the source packet object.</param>
+        /// <returns><see cref="FlowKey"/> extracted from the <paramref name="source"/> packet. </returns>
         protected override FlowKey GetFlowKey(PacketRecord<Packet> source)
         {
             return source.Key;

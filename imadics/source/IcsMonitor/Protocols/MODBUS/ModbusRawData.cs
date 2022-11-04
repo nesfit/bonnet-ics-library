@@ -3,7 +3,7 @@
 namespace IcsMonitor.Modbus
 {
     /// <summary>
-    /// A full version of MODBUS flow record.
+    /// A full version of the MODBUS flow record.
     /// </summary>
     [MessagePackObject]
     public struct ModbusRawData

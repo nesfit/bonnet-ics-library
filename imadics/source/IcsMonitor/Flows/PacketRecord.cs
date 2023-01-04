@@ -2,6 +2,7 @@
 using SharpPcap;
 using System;
 using Traffix.Core.Flows;
+using Traffix.Providers.PcapFile;
 
 namespace IcsMonitor.Flows
 {
@@ -23,12 +24,24 @@ namespace IcsMonitor.Flows
         {
             try
             {
-                var packet = rawCapture.GetPacket(); // PacketDotNet.Packet.ParsePacket(arg.LinkLayerType, arg.Data);
+                var packet = PacketDotNet.Packet.ParsePacket(rawCapture.LinkLayerType, rawCapture.Data);
                 return new PacketRecord<Packet>(rawCapture.Timeval.Date.Ticks, label, packet.GetFlowKey(), packet);
             }
             catch
             {
                 return new PacketRecord<Packet>(rawCapture.Timeval.Date.Ticks, label, NullFlowKey.Instance , new NullPacket(NullPacketType.IPv4));
+            }
+        }
+        public static PacketRecord<Packet> FromFrame(RawFrame rawCapture, string label)
+        {
+            try
+            {
+                var packet = PacketDotNet.Packet.ParsePacket(rawCapture.LinkLayer, rawCapture.Data);
+                return new PacketRecord<Packet>(rawCapture.Ticks, label, packet.GetFlowKey(), packet);
+            }
+            catch
+            {
+                return new PacketRecord<Packet>(rawCapture.Ticks, label, NullFlowKey.Instance, new NullPacket(NullPacketType.IPv4));
             }
         }
         /// <summary>

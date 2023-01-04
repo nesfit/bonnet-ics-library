@@ -6,7 +6,7 @@
 	<TargetFramework>net5.0</TargetFramework>
 	<LangVersion>preview</LangVersion>
 	<StartupObject>IcsMonitor.Program</StartupObject>
-    <Version>0.0.1</Version>
+    <Version>1.0.23.0401</Version>
     <Company>Brno University of Technology</Company>
     <Authors>Ondrej Rysavy</Authors>
     <Description>A tool for anomaly detection in industrial communication networks.</Description>
@@ -17,6 +17,8 @@
 
 	<PropertyGroup>
 		<RestoreSources>$(RestoreSources);../../packages;https://api.nuget.org/v3/index.json</RestoreSources>
+		<FileVersion>1.0.23.0401</FileVersion>
+		<AssemblyVersion>1.0.23.0401</AssemblyVersion>
 	</PropertyGroup>
 	
   <ItemGroup>

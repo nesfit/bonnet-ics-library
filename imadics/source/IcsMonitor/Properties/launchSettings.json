@@ -31,7 +31,7 @@
     },
     "build-profile-file": {
       "commandName": "Project",
-      "commandLineArgs": "build-profile -r \"lemay\\attack\\characterization_modbus_6RTU_with_operate.pcap\" -t \"00:01:00\" -c 30 -m Centroids -p Modbus -f \"ForwardMetricsPackets,ForwardMetricsOctets,ReverseMetricsPackets,ReverseMetricsOctets\" -w \"profiles\\6RTU_with_operate.profile.zip\"",
+      "commandLineArgs": "build-profile -r \"E:\\Bonnet\\captures\\factory\\normal\\Net-Assembler_Basic_Normal.pcap\" -t \"00:01:00\" -c 30 -m Centroids -p Modbus -f \"ForwardMetricsPackets,ForwardMetricsOctets,ReverseMetricsPackets,ReverseMetricsOctets\" -w \"E:\\Bonnet\\captures\\factory\\normal\\Net-Assembler_Basic_Normal.profile.zip\"",
       "workingDirectory": "$(SolutionDir)data\\modbus"
     },
     "test-flows": {

@@ -14,8 +14,8 @@ namespace IcsMonitor
         private void WatchTrafficCommand(CommandLineApplication command)
         {
             command.Description = "Watch traffic and test flows using the existing profile.";
-            command.ExtendedHelpText = "This command monitors the communication on the given capture device, collects flows of the target profile protocol and " +
-            "applies the pre-learned profile.";
+            command.ExtendedHelpText = "This command monitors the communication on the given capture device (can be a capture file), collects flows based on the information from the given profile and " +
+            "applies the pre-learned profile to test the flows.";
             command.HelpOption("-?|-h|--help");
 
             var inputOption = command.AddInputOptions();
@@ -28,12 +28,17 @@ namespace IcsMonitor
                 $"A format of the output. Can be one of {String.Join(", ", Enum.GetNames(typeof(OutputFormat)))}. Default is {nameof(OutputFormat.Json)}.",
                 CommandOptionType.SingleValue);
 
+            var replaySpeedOption = command.Option("-s|--replay-speed <value>",
+                $"If capture file is provided as a source, this option determines its replay speed. (This parameter is optional)",
+                CommandOptionType.SingleValue);
+
             command.OnExecute(async () =>
             {
                 if (!profileFileOption.TryGetValueOrError(() => Console.Error.WriteLine($"Error: '--{profileFileOption.LongName}' option is required!"), out var profileFile)) return -1;
                 if (!outputFormatOption.TryParseValueOrDefault(EnumTryParse, OutputFormat.Json, _ => Console.Error.WriteLine("Input error: Invalid input value specified."), out var outputFormat)) return -1;
 
-                var device = inputOption.GetCaptureDevice();
+                replaySpeedOption.TryParseValueOrDefault<float>(float.TryParse, 0f, _ => Console.Error.WriteLine("Input error: Invalid replay speed specified. It must be a float value."), out var replaySpeed);
+                var device = inputOption.GetCaptureDevice(replaySpeed);
                 await _functions.WatchTrafficAsync(device, _functions.LoadProfileFromFile(profileFile), outputFormat, Console.Out, _appLifetime.ApplicationStopping);
                 return 0;
             });

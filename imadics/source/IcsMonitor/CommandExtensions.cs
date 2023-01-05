@@ -19,9 +19,13 @@ namespace IcsMonitor
         /// Gets the capture device as given in this comfigration record.
         /// </summary>
         /// <returns>The capture device object or null, if the current configuration does not specify a valid interface.</returns>
-        public ICaptureDevice GetCaptureDevice()
+        public ICaptureDevice GetCaptureDevice(float replaySpeed = 0f)
         {
-            if (CaptureFile.HasValue())
+            if (CaptureFile.HasValue() && replaySpeed > 0)
+            {
+                return new CaptureFileReplayDevice(CaptureFileValue, replaySpeed);
+            }
+            if (CaptureFile.HasValue() && replaySpeed > 0)
             {
                 return new CaptureFileReaderDevice(CaptureFileValue);
             }
@@ -57,6 +61,9 @@ namespace IcsMonitor
         /// </summary>
         public bool HasFlowFile => FlowFile.HasValue();
     }
+
+
+
 
     /// <summary>
     /// Provides several extensions usable in command objects.

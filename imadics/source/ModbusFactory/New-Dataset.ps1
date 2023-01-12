@@ -2,12 +2,14 @@
 <#
 .SYNOPSIS
 
-Generate new collection of captures for the specified scene. 
+Generate a new collection of captures for the specified scene. 
 
 .DESCRIPTION
 
-The New-Dataset starts packet capturing and runs the currently loaded scene in Factory I/O.
-It enables to create a multiple captures by running the scene by the number of timmes. 
+New-Dataset command will start capturing packets and start the currently loaded scene in Factory I/O. 
+It allows you to create multiple capture files by specifying the desired number of iterations. 
+
+This script expects that the corresponding scene is loaded in Factory.IO and MODBUS server is initialized.
 
 .PARAMETER Scene
 A name of the scene to run in the simulation.
@@ -77,8 +79,8 @@ foreach ($run in $runs){
     Invoke-WebRequest $uri -Method Put -Body $jsonStop -ContentType 'application/json'
 
     # Run SampleScene
-    Start-Process -FilePath "SampleScenes.exe" -ArgumentList $ModbusServer,$Scene
-    $p = Get-Process "SampleScenes"
+    Start-Process -FilePath "ModbusFactory.exe" -ArgumentList $ModbusServer,$Scene
+    $p = Get-Process "ModbusFactory"
     
     # Run Factory
     Invoke-WebRequest $uri -Method Put -Body $jsonStart -ContentType 'application/json'

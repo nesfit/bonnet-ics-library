@@ -30,11 +30,29 @@ The issue is that it seems this is not possible programmatically and must be onl
 
 Morris and Gao (2013) identified 17 different attacks on ICS communiting with MODBUS protocol. They grouped these attacks into the following categories:
 
-* Reconnaissance activities consist of (A1) Address Scan, (A2) Function Code Scan, and (A3) Device Identification
-* Response and measurement injection attacks comprise of (A4) Naïve Read Payload Size, (A5) Invalid Read Payload Size, (A6)  Naïve False Error Response, 
-(A7) Sporadic Sensor Measurement Injection, (A8) Calculated Sensor Measurement Injection, (A9) Replayed Measurement Injection, (A10) High Frequency Measurement Injection. 
-* Commands injection stands for sending false control and configuration commands into a control system.
-* Denial of Service
+* Reconnaissance (REC) activities consist of:
+** (A1) Address Scan
+** (A2) Function Code Scan, and 
+** (A3) Device Identification
+* Response and Measurement Injection (NMRI) attacks comprise of:
+** (A4) Naïve Read Payload Size, 
+** (A5) Invalid Read Payload Size,
+** (A6)  Naïve False Error Response, 
+** (A7) Sporadic Sensor Measurement Injection
+* Complex Malicious Response Injection (CMRI) attacks require understanding of the cyber physical system under attack. CMRI attacks attempt maliciously control the system by
+modifying the sensor value being reported. It comprises of: 
+** (A8) Calculated Sensor Measurement Injection, 
+** (A9) Replayed Measurement Injection, and 
+** (A10) High Frequency Measurement Injection. 
+* Command Injection (CI) Attacks send false control and configuration commands into a control system:
+** (A11) Altered System Control Scheme, 
+** (A12) Altered Actuator State, 
+** (A13) 
+** (A14) 
+** (A15)
+* Denial of Service (DOS) contains:
+** (A16) Invalid CRC  
+** (A17) MODBUS Traffic Jamming.
 
 Attacks 8-10 are designed to look like normal process functions and because these attacks reflect a normal state, it is very difficult to detect them.
 

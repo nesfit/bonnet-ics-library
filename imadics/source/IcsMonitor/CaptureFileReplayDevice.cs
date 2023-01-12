@@ -166,6 +166,7 @@ namespace IcsMonitor
                 threadCancellationTokenSource.Cancel();
                 threadCancellationTokenSource = new CancellationTokenSource();
                 Task.WaitAny(new[] { captureThread }, StopCaptureTimeout);
+                SendCaptureStoppedEvent(CaptureStoppedEventStatus.CompletedWithoutError);
                 captureThread = null;
             };
         }
@@ -179,6 +180,11 @@ namespace IcsMonitor
         {
             OnPacketArrival?.Invoke(this, new CaptureEventArgs(rawCapture, this));
         }
+        protected void SendCaptureStoppedEvent(CaptureStoppedEventStatus status)
+        {
+            OnCaptureStopped?.Invoke(this, status);
+        }
+
 
         protected async Task CaptureThreadAsync(CancellationToken cancellationToken)
         {
@@ -187,6 +193,11 @@ namespace IcsMonitor
 
             // Get the first capture and initializes necessary values:
             var rawCapture = this.GetNextPacket();
+            if (rawCapture == null)
+            {
+                SendCaptureStoppedEvent(CaptureStoppedEventStatus.CompletedWithoutError);
+                return;
+            }
             var virtualTimeOrigin = rawCapture.Timeval.Date.Ticks;
             var realTimeOrigin = DateTime.Now.Ticks;
             SendPacketArrivalEvent(rawCapture);
@@ -194,6 +205,11 @@ namespace IcsMonitor
             while (!cancellationToken.IsCancellationRequested)
             {
                 rawCapture = this.GetNextPacket();
+                if (rawCapture == null)
+                {
+                    SendCaptureStoppedEvent(CaptureStoppedEventStatus.CompletedWithoutError);
+                    return;
+                }
                 var virtualOffsetTicks = rawCapture.Timeval.Date.Ticks - virtualTimeOrigin;
                 var realOffsetTicks = DateTime.Now.Ticks - realTimeOrigin;
                 var expectedRealOffsetTicks = (long)(virtualOffsetTicks / _replaySpeed);

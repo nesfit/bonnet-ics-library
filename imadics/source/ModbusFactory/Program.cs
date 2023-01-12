@@ -24,16 +24,22 @@ namespace SampleScenes
             || !TryGetSceneType(args[1], out var sceneType))
             {
                 Console.WriteLine ("Missing or invalid arguments. Please provide valid connection information and scene configuration.");
-                Console.WriteLine ("Usage: SortingStation IP-ADDRESS:PORT/DEVICE-ID SCENE CONFIG.CSV [WAIT|AUTOSTART]");
+                Console.WriteLine ("Usage: SortingStation IP-ADDRESS:PORT/DEVICE-ID SCENE");
                 Console.WriteLine ("");
                 Console.WriteLine ("       IP-ADDRESS:PORT/DEVICE-ID  the IP address and port of the MODBUS TCP server, DEVICE-ID accessible on that server.");
-                Console.WriteLine ("       SCENE name of the scene");
+                Console.WriteLine ("       SCENE name of the scene, currently, one of the following:");
+
+                Console.WriteLine ("            Assembler - Assemble parts made of lids and bases using a two-axis pick and place.");
+                Console.WriteLine ("            AssemblerAnalog - Assemble parts made of lids and bases using a two-axis pick and place with analog values.");
+                Console.WriteLine ("            ProductionLine - Produce the same number of lids and bases by controlling two machining centers.");
+                Console.WriteLine ("            SeparatingStation - Separate blue and green parts into two conveyors.");
+                Console.WriteLine ("            SortingStation - Separate green and blue items using a vision sensor.");
                 return;
             }
             var tagsFile = $"Tags_{args[1]}_Modbus.csv";
             if (!TryLoadTagsFile(tagsFile, out var registerMap))
             {
-                throw new ArgumentException("Cannot load Tags file.");
+                throw new ArgumentException($"Cannot load Tags file {tagsFile} for the specified scene.");
             }
             var screen = Screen.CreateScreen(out var ncurses);
             if (ncurses == false)

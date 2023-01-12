@@ -1,0 +1,84 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":null,"items":[{"name":"csharp","languageName":"C#","aliases":["c#","cs"]},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"html","languageName":"HTML"},{"name":"sql","languageName":"SQL"},{"name":"kql","languageName":"KQL"},{"name":"mermaid","languageName":"Mermaid"},{"name":"httpRequest","languageName":"http"},{"name":"value"}]}}
+
+#!markdown
+
+## Preliminaries
+
+1. Factory I/O Ultimate edition is installed
+
+2. Wireshark is installed and path to `tshark.exe` is in $env:Path
+
+#!pwsh
+
+tshark.exe --version
+
+#!markdown
+
+# Normal Datasets
+
+Normal datasets are created for attack-free scenarios. Several normal datasets for each scenario are created. These server for training and for the evaluation of the profile coverage.
+
+#!pwsh
+
+$binpath = Join-Path -Path (Split-Path -Path $pwd -Parent) -ChildPath "publish";
+echo "Adding path to folder with IMADICS binaries $binpath"
+$pathArray = $env:Path -split ';'
+$env:Path = ($pathArray + $binpath) -join ';'
+echo $env:Path
+
+#!pwsh
+
+IcsMonitor.exe --version
+
+#!markdown
+
+## Prepare Factory I/O
+
+1. We need to have running instance of Factory.IO Ultimate Edition. 
+
+2. Web server in Factory I/O must be activated with the app.web_server = True console command
+
+ 
+
+#!pwsh
+
+$ModbusServer = "172.23.228.153:502"
+$FactoryApi = "172.23.228.153:7410"
+
+#!markdown
+
+# Create Assembler Dataset
+
+Load Assembler scene and configure it for using with MODBUS server.
+
+The script can automatically run the scene and restart it depending on the number of runs specified. 
+
+The output capture files are in [CAPTURE](.\capture) folder.
+
+#!pwsh
+
+New-Dataset.ps1 -Scene Assembler -ModbusServer "$ModbusServer/1" -FactoryApi $FactoryApi -OutputFolder .\captures -Duration 00:00:30 -RunCount 5
+
+#!markdown
+
+# Assembler with scan attack
+
+TODO: How to run scan and normal communication together?
+
+#!pwsh
+
+Anomalify.exe Address-Scan $ModbusServer 1,2,30..40
+
+#!pwsh
+
+Anomalify.exe FunctionCode-Scan "$ModbusServer/1" 1,2,3,4,5,6,7,8,11,12,15,16,17,20,21,22,23,24,43
+
+#!pwsh
+
+Anomalify.exe FunctionCode-Scan "$ModbusServer/1" 1,2,3,4,5,6,7,8,11,12,15,16,17,20,21,22,23,24,43
+
+#!pwsh
+
+Anomalify.exe DeviceIdentification-Scan "$ModbusServer/1" 0..6

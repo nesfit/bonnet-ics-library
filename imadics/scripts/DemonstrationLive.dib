@@ -87,6 +87,8 @@ IcsMonitor Build-Profile -i 0 -m Centroids -p Modbus -t 00:00:5 -c 25 -w .\profi
 
 ### Anomaly Detection
 
+First, we test the coverage of the profile. It means that the profile should match most (ideally all) flows when the factory works well. 
+
 #!pwsh
 
 Start-Process -FilePath "IcsMonitor" -ArgumentList "Watch-Traffic","-i", "0", "-p",".\profiles\Assembler-Demo.profile", "-f", "yaml"

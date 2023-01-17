@@ -1,7 +1,11 @@
 ﻿using IcsMonitor.Utils;
 using Microsoft.Extensions.CommandLineUtils;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Traffix.DataView;
+using static IcsMonitor.AnomalyDetection.ClusterModel;
+using static Traffix.Extensions.Decoders.Industrial.DlmsData;
 
 namespace IcsMonitor
 {
@@ -25,11 +29,15 @@ namespace IcsMonitor
                 CommandOptionType.SingleValue);
 
             var outputFormatOption = command.Option("-f|--output-format <value>",
-                $"A format of the output. Can be one of {String.Join(", ", Enum.GetNames(typeof(OutputFormat)))}. Default is {nameof(OutputFormat.Json)}.",
+                $"A format of the output. Can be one of {String.Join(", ", System.Enum.GetNames(typeof(OutputFormat)))}. Default is {nameof(OutputFormat.Json)}.",
                 CommandOptionType.SingleValue);
 
             var replaySpeedOption = command.Option("-s|--replay-speed <value>",
                 $"If capture file is provided as a source, this option determines its replay speed. (This parameter is optional)",
+                CommandOptionType.SingleValue);
+
+            var timeoutOption = command.Option("-t|--timeout <value>",
+                $"Specifies the traffic monitoring time. After this time, the monitor stops. (This parameter is optional)",
                 CommandOptionType.SingleValue);
 
             command.OnExecute(async () =>
@@ -38,7 +46,26 @@ namespace IcsMonitor
                 if (!outputFormatOption.TryParseValueOrDefault(EnumTryParse, OutputFormat.Json, _ => Console.Error.WriteLine("Input error: Invalid input value specified."), out var outputFormat)) return -1;
 
                 replaySpeedOption.TryParseValueOrDefault<float>(float.TryParse, 0f, _ => Console.Error.WriteLine("Input error: Invalid replay speed specified. It must be a float value."), out var replaySpeed);
+                timeoutOption.TryParseValueOrDefault<TimeSpan>(TimeSpan.TryParse, Timeout.InfiniteTimeSpan, _ => Console.Error.WriteLine("Input error: Invalid timout specified. It must be a timespan in the format \"hh:mm:ss\"."), out var timeoutSpan);
+
                 var device = inputOption.GetCaptureDevice(replaySpeed);
+
+                if (device == null)
+                {
+                    Console.Error.WriteLine($"Input error:Cannot open source {inputOption}.");
+                    return 1;
+                }
+                // this task is not needed
+                var __timeoutTask = Task.Delay(timeoutSpan, _appLifetime.ApplicationStopping).ContinueWith(t => _appLifetime.StopApplication() );
+                var infoString = $@"Running Monitor:
+    command: Watch-Traffic
+    input-device: {device.Name} 
+    profile: {profileFile}
+    output-format: {outputFormat}
+    output-device: Console.Out
+    time-out: {((timeoutSpan == Timeout.InfiniteTimeSpan) ? "Infinite" : timeoutSpan.ToString()) }
+---";
+                Console.Error.WriteLine(infoString);
                 await _functions.WatchTrafficAsync(device, _functions.LoadProfileFromFile(profileFile), outputFormat, Console.Out, _appLifetime.ApplicationStopping);
                 return 0;
             });

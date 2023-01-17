@@ -95,7 +95,7 @@ namespace IcsMonitor
                 _logger.LogInformation($"Progress: {flowCount} flows identified and tested in the current window, {++windows} windows completed.");
             });
             _logger.LogInformation($"Input observable completed: {windows} windows collected, {totalFlows} flows tested.");
-            outputFileWriter.EndDocument();
+            outputFileWriter?.EndDocument();    // may not be initialized if no flows were processed...
             device.Close();
         }
 

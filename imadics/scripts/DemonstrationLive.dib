@@ -1,0 +1,108 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":null,"items":[{"name":"csharp","languageName":"C#","aliases":["c#","cs"]},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"html","languageName":"HTML"},{"name":"sql","languageName":"SQL"},{"name":"kql","languageName":"KQL"},{"name":"mermaid","languageName":"Mermaid"},{"name":"httpRequest","languageName":"http"},{"name":"value"}]}}
+
+#!markdown
+
+# Prerequisities
+
+The path to project binaries need to be set.
+
+#!pwsh
+
+$binpath = Join-Path -Path (Split-Path -Path $pwd -Parent) -ChildPath "publish";
+echo "Adding path to folder with IMADICS binaries $binpath"
+$pathArray = $env:Path -split ';'
+$env:Path = ($pathArray + $binpath) -join ';'
+echo $env:Path
+
+#!markdown
+
+# Demonstration of IMADICS
+
+This notebook contains a demonstration of the AD methods based on clustering. The profile consists of clusters of points representing normal traffic. The points are computed from features extracted from IPFIX records. 
+
+The AD tool is implemented in `IcsMonitor` executable file that provide console-based UI. The tool has different modes:
+
+#!pwsh
+
+IcsMonitor -?
+
+#!markdown
+
+## Learned profile
+
+We prelearned profile from the normal system. 
+
+The profile was learned by the following command: 
+
+```bash
+IcsMonitor Build-Profile -r .\Captures\Assembler-Normal-05.pcap -m Centroids -p Modbus -t "00:00:10" -w "Assembler-Normal-10s.profile.zip"
+```
+
+The profile parameters are:
+
+#!pwsh
+
+IcsMonitor Show-Profile --profile-file .\profiles\Assembler-Normal-10s.profile
+
+#!markdown
+
+## Offline Mode -- Coverage Test
+
+We can apply the learned profile to test the system. For the purpose of research and development we can apply the profile to offline traffic:
+
+#!pwsh
+
+IcsMonitor Watch-Traffic -r E:\Bonnet\captures\factory\Captures\Assembler-Normal-01.pcap -p .\profiles\Assembler-Normal-10s.profile -f yaml
+
+#!markdown
+
+## Online Mode
+
+In online mode, we observe the communication in the system and apply profile to detect anomalous flows.
+
+This step assumes Factory I/O is running and the following has been made:
+*  Web server in Factory I/O must be activated with the `app.web_server = True` console command.
+*  Assembler scene was loaded. 
+* The controller is set to Modbus TCP/IP Server and it was started.
+
+The following command run Modbus Factory controller.
+
+#!pwsh
+
+Start-Process -FilePath "D:\GitHub\bonnet-ics-library\imadics\publish\ModbusFactory.exe" -ArgumentList "172.23.228.153:502/1","Assembler"
+
+#!markdown
+
+### Learning Profile
+
+We only learn the profile for 2 minutes of system activity. It creates less robust profile, but it is enough for the demonstration.
+
+#!pwsh
+
+IcsMonitor Build-Profile -i 0 -m Centroids -p Modbus -t 00:00:5 -c 25 -w .\profiles\Assembler-Demo.profile
+
+#!markdown
+
+### Anomaly Detection
+
+#!pwsh
+
+Start-Process -FilePath "IcsMonitor" -ArgumentList "Watch-Traffic","-i", "0", "-p",".\profiles\Assembler-Demo.profile", "-f", "yaml"
+
+#!markdown
+
+### Inject Scanning Attacks
+
+The following is a simple function scan attack that can be because of its rate easily recognized by the profile.
+
+#!pwsh
+
+..\publish\Anomalify.exe FunctionCode-Scan 172.23.228.153:502/1 1..20
+
+#!markdown
+
+### Inject Factory Failure
+
+* Lid clamped off failure -- cause that the process blocks and this can be easily detected. 

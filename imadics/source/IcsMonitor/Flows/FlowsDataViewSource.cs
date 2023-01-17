@@ -143,12 +143,12 @@ namespace IcsMonitor.Flows
     /// <summary>
     /// Supports observable for the capture device.
     /// </summary>
-    class PacketDeviceSource : IDisposable
+    class PacketDeviceSource
     {
-        private readonly ICaptureDevice _captureDevice;
-        private readonly IObserver<PacketRecord<Packet>> _observer;
-        private readonly CancellationToken _cancellationToken;
-
+        private ICaptureDevice _captureDevice;
+        private IObserver<PacketRecord<Packet>> _observer;
+        private CancellationToken _cancellationToken;
+        private Task _cancellationTask;
         /// <summary>
         /// Creates a new packet device source.
         /// </summary>
@@ -159,10 +159,17 @@ namespace IcsMonitor.Flows
         {
             _captureDevice = captureDevice;
             _observer = observer;
+            _cancellationToken = cancellationToken;
             _captureDevice.OnPacketArrival += _captureDevice_OnPacketArrival;
             _captureDevice.OnCaptureStopped += _captureDevice_OnCaptureStopped;
             _captureDevice.StartCapture();
             _cancellationToken = cancellationToken;
+            _cancellationTask = Task.Delay(-1,_cancellationToken).ContinueWith(t => CancelCapture());
+        }
+
+        private void CancelCapture() 
+        { 
+            _captureDevice.StopCapture();
         }
 
         /// <summary>
@@ -178,27 +185,15 @@ namespace IcsMonitor.Flows
         /// </summary>
         private void _captureDevice_OnPacketArrival(object sender, CaptureEventArgs e)
         {
-            if (_cancellationToken.IsCancellationRequested)
-            {
-                _captureDevice.StopCapture();
-                _observer.OnCompleted();
-            }
-            else 
-            {
-                PacketCount++;
-                _observer.OnNext(PacketRecord<Packet>.FromFrame(e.Packet, null));
-            }
+            PacketCount++;
+            _observer.OnNext(PacketRecord<Packet>.FromFrame(e.Packet, null));
         }
 
         /// <summary>
         /// Gets the number of packets provided so far.
         /// </summary>
         public int PacketCount { get; private set; }
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            if (_captureDevice.Started) Close();
-        }
+
         /// <summary>
         /// Subsrcibes the <paramref name="observer"/> to the newly created packet source provider based on <paramref name="captureDevice"/>.
         /// </summary>
@@ -209,15 +204,29 @@ namespace IcsMonitor.Flows
         public static IDisposable Subscribe(ICaptureDevice captureDevice, IObserver<PacketRecord<Packet>> observer, CancellationToken cancellationToken)
         {
             var tf = new PacketDeviceSource(captureDevice, observer, cancellationToken);
-            return tf;
+            return new DisposableCapture(tf);
         }
         /// <summary>
         /// Closes the packet source provider.
         /// </summary>
         public void Close()
         {
-            if (_captureDevice.Started) 
-                _captureDevice.StopCapture();
+            _captureDevice.Close();           
+        }
+
+        class DisposableCapture : IDisposable
+        {
+            private PacketDeviceSource _packetDeviceSource;
+
+            public DisposableCapture(PacketDeviceSource packetDeviceSource)
+            {
+                this._packetDeviceSource = packetDeviceSource;
+            }
+
+            public void Dispose()
+            {
+                _packetDeviceSource = null;
+            }
         }
     }
 

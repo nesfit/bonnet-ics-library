@@ -58,6 +58,10 @@
       "commandName": "Project",
       "commandLineArgs": "test-flows -R \"bonnet\\normal-traffic.csv\" -p \"profiles\\bonnet_normal_traffic.profile.zip\" -f csv -t 0.1 -w \"bonnet\\normal-traffic.score.csv\"",
       "workingDirectory": "$(SolutionDir)data\\iec"
+    },
+    "BUGFIX": {
+      "commandName": "Project",
+      "commandLineArgs": "Watch-Traffic -i 0 -p D:\\GitHub\\bonnet-ics-library\\imadics\\scripts\\profiles\\Assembler-Normal-10s.profile -f yaml -t 00:00:10 "
     }
   }
 }

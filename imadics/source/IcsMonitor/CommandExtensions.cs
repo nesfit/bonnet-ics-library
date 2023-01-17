@@ -25,7 +25,7 @@ namespace IcsMonitor
             {
                 return new CaptureFileReplayDevice(CaptureFileValue, replaySpeed);
             }
-            if (CaptureFile.HasValue() && replaySpeed > 0)
+            if (CaptureFile.HasValue())
             {
                 return new CaptureFileReaderDevice(CaptureFileValue);
             }
@@ -39,6 +39,13 @@ namespace IcsMonitor
             }
             return null;
         }
+
+        public override string ToString()
+        {
+            return $"FlowFile: '{FlowFileValue}', CaptureFile: '{CaptureFileValue}', DeviceName: '{DeviceNameValue}', DeviceIndex: {DeviceIndexValue}";
+        }
+
+
         /// <summary>
         /// The name of the flow file or null.
         /// </summary>
@@ -54,7 +61,7 @@ namespace IcsMonitor
         /// <summary>
         /// The index of the network device.
         /// </summary>
-        public int DeviceIndexValue => Int32.Parse(DeviceIndex.Value());
+        public int DeviceIndexValue => Int32.TryParse(DeviceIndex.Value(), out var index) ? index : -1;
 
         /// <summary>
         /// True if flow file is specified in the current configuration record.

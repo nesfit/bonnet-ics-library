@@ -177,7 +177,7 @@ namespace IcsMonitor.Flows
         /// </summary>
         private void _captureDevice_OnCaptureStopped(object sender, CaptureStoppedEventStatus status)
         {
-            _observer.OnCompleted();
+            _observer?.OnCompleted();
         }
         
         /// <summary>
@@ -186,7 +186,7 @@ namespace IcsMonitor.Flows
         private void _captureDevice_OnPacketArrival(object sender, CaptureEventArgs e)
         {
             PacketCount++;
-            _observer.OnNext(PacketRecord<Packet>.FromFrame(e.Packet, null));
+            _observer?.OnNext(PacketRecord<Packet>.FromFrame(e.Packet, null));
         }
 
         /// <summary>
@@ -195,7 +195,7 @@ namespace IcsMonitor.Flows
         public int PacketCount { get; private set; }
 
         /// <summary>
-        /// Subsrcibes the <paramref name="observer"/> to the newly created packet source provider based on <paramref name="captureDevice"/>.
+        /// Subscribes the <paramref name="observer"/> to the newly created packet source provider based on <paramref name="captureDevice"/>.
         /// </summary>
         /// <param name="captureDevice">The capture device.</param>
         /// <param name="observer">the observer object.</param>
@@ -205,13 +205,6 @@ namespace IcsMonitor.Flows
         {
             var tf = new PacketDeviceSource(captureDevice, observer, cancellationToken);
             return new DisposableCapture(tf);
-        }
-        /// <summary>
-        /// Closes the packet source provider.
-        /// </summary>
-        public void Close()
-        {
-            _captureDevice.Close();           
         }
 
         class DisposableCapture : IDisposable
@@ -223,9 +216,10 @@ namespace IcsMonitor.Flows
                 this._packetDeviceSource = packetDeviceSource;
             }
 
+            // in this method, the unsubscribe should be called...
             public void Dispose()
             {
-                _packetDeviceSource = null;
+                _packetDeviceSource._observer = null;
             }
         }
     }
